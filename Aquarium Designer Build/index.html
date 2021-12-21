@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Aquarium Designer</title>
+		<link rel="stylesheet" href="style.css">
+	</head>
+	<body style="text-align: center">
+	<canvas id="unity-canvas" style="background: #231F20"></canvas>
+	<script src="Build/Aquarium Designer Build.loader.js"></script>
+	<script>
+	createUnityInstance(document.querySelector("#unity-canvas"), {
+		dataUrl: "Build/Aquarium Designer Build.data.gz",
+		frameworkUrl: "Build/Aquarium Designer Build.framework.js.gz",
+		codeUrl: "Build/Aquarium Designer Build.wasm.gz",
+		streamingAssetsUrl: "StreamingAssets",
+		companyName: "khunnnour",
+		productName: "Aquarium Designer",
+		productVersion: "0.1",
+	});
+	//float newW = window.innerWidth;
+	//float newH = window.innerHeight;
+	//console.log(newW + ", " + newH);
+	</script>
+	<script src="script.js"></script>
+	</body>
+</html>
