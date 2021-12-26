@@ -1,16 +1,24 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class DecoPlacer : MonoBehaviour
 {
+    public GameObject moveHandleObj;
+
     private const string ASSET_PATH = "Prefabs/";
 
     private Camera _mainCam;
+    private Ray _mouseRay;
+    private RaycastHit _mouseRayHit;
     private Transform _clampObj;
     private GameObject _objToPlace;
     private GameObject _prefabToPlace;
-    private bool _placing;
+    private bool _placing, _moving;
+    private Vector3 _moveAxis;
 
     // Start is called before the first frame update
     void Start()
@@ -20,16 +28,107 @@ public class DecoPlacer : MonoBehaviour
         _clampObj = DesignerManager.Instance.decorObj.transform.GetChild(0);
 
         _placing = false;
+        _moving = false;
+
+        moveHandleObj.SetActive(false);
+
+        _moveAxis = Vector3.zero;
     }
 
     // Update is called once per frame
     void Update()
     {
+        // get world location of mouse pointer
+        _mouseRay = _mainCam.ScreenPointToRay(Input.mousePosition);
+        // cast ray
+        Physics.Raycast(_mouseRay, out _mouseRayHit, 5f, ~LayerMask.GetMask("Glass", "Water"));
+
+        // get world location of mouse pointer
         if (_placing)
-            GetInput();
+            HandlePlacing();
+        else
+        {
+            if (_moving)
+                Shift();
+
+            HandleMoving();
+        }
     }
 
-    void GetInput()
+    private void Shift()
+    {
+        // find closest point on skew lines mouse ray and move axis 
+        //   move axis: v1 = p1 + d1
+        //   mouse ray: v2 = p2 + d2
+
+        Vector3 p1 = _objToPlace.transform.position;
+
+        // get perpendicular ray
+        Vector3 n = Vector3.Cross(_moveAxis, _mouseRay.direction);
+        Vector3 n1 = Vector3.Cross(_moveAxis, n);
+        Vector3 n2 = Vector3.Cross(_mouseRay.direction, n);
+
+        // find closest point
+        Vector3 c1 = p1 + _moveAxis * (
+            Vector3.Dot(_mouseRay.origin - p1, n2) /
+            Vector3.Dot(_moveAxis, n2));
+        Vector3 c2 = _mouseRay.origin + _mouseRay.direction * (
+            Vector3.Dot(p1 - _mouseRay.origin, n1) /
+            Vector3.Dot(_mouseRay.direction, n1));
+
+        moveHandleObj.transform.position = c1;
+        
+        Debug.DrawRay(_mouseRay.origin, _mouseRay.direction * 2f);
+        Debug.DrawRay(p1, _moveAxis * 2f);
+        Debug.DrawLine(c1, c2, Color.red);
+    }
+
+    void HandleMoving()
+    {
+        // place on left click
+        if (Input.GetMouseButtonDown(0))
+        {
+            // if there is already an object selected
+            if (_objToPlace)
+            {
+                // if object clicked is a handle
+                if (_mouseRayHit.transform.CompareTag("Handle"))
+                {
+                    _moving = true;
+                    _moveAxis = _mouseRayHit.transform.GetComponent<Handle>()._axis;
+                }
+                else // otherwise clear selection
+                {
+                    ClearMoving();
+                }
+            }
+            else
+            {
+                // otherwise, see if clicked a valid object to move
+                if (_mouseRayHit.transform&&_mouseRayHit.transform.CompareTag("Decor"))
+                {
+                    _moving = true;
+                    _objToPlace = _mouseRayHit.transform.gameObject;
+                    moveHandleObj.transform.position = _objToPlace.transform.position;
+                    moveHandleObj.SetActive(true);
+                }
+            }
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            _moving = false;
+        }
+    }
+
+    private void ClearMoving()
+    {
+        _moving = false;
+        _moveAxis = Vector3.zero;
+        _objToPlace = null;
+        moveHandleObj.SetActive(false);
+    }
+
+    void HandlePlacing()
     {
         // place on left click
         if (Input.GetMouseButtonDown(0))
@@ -47,31 +146,23 @@ public class DecoPlacer : MonoBehaviour
             return;
         }
 
-
         // move object based on mouse position
         UpdateObject();
     }
 
     void UpdateObject()
     {
-        // get world location of mouse pointer
-        Ray mouseRay = _mainCam.ScreenPointToRay(Input.mousePosition);
-        Physics.Raycast(mouseRay, out RaycastHit hit, 5f,~LayerMask.GetMask("Glass","Water"));
-        
-        Debug.DrawRay(_mainCam.transform.position, mouseRay.direction * 5f);
-        Debug.DrawLine(hit.point, hit.point + hit.normal * 2);
-
         Vector3 constraints = _clampObj.localScale * 0.5f;
 
         // location is where the raycast hit
-        Vector3 newPos = hit.point;
+        Vector3 newPos = _mouseRayHit.point;
         // clamp values to decor object
         newPos.x = Mathf.Min(constraints.x, Mathf.Max(-constraints.x, newPos.x));
         newPos.y = _clampObj.position.y + constraints.y + 0.01f;
         newPos.z = Mathf.Min(constraints.z, Mathf.Max(-constraints.z, newPos.z));
 
         //Debug.Log(newPos);
-        
+
         // set object you are placing to that location
         _objToPlace.transform.position = newPos;
     }
@@ -81,12 +172,15 @@ public class DecoPlacer : MonoBehaviour
         // get prefab of object to spawn
         _prefabToPlace = Resources.Load<GameObject>(ASSET_PATH + objName);
 
-        // start the placing
-        StartPlacing();
+        // start the placing if found a prefab
+        if (_prefabToPlace)
+            StartPlacing();
     }
 
     private void StartPlacing()
     {
+        ClearMoving();
+
         _objToPlace = Instantiate(_prefabToPlace, DesignerManager.Instance.decorObj.transform);
         _objToPlace.layer = LayerMask.NameToLayer("Glass");
         _placing = true;

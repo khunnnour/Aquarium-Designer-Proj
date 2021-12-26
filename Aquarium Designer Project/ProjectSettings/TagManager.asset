@@ -7,6 +7,7 @@ TagManager:
   - Tank
   - DesignerManager
   - Decor
+  - Handle
   layers:
   - Default
   - TransparentFX
