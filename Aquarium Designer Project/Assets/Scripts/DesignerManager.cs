@@ -1,13 +1,11 @@
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class DesignerManager : MonoBehaviour
 {
     public static DesignerManager Instance;
-    
+
     [Header("Object References")] public GameObject tankObj;
     public GameObject decorObj;
 
@@ -16,19 +14,17 @@ public class DesignerManager : MonoBehaviour
     public InputField tankDimX;
     public InputField tankDimY;
     public InputField tankDimZ;
-    
-    [Header("Decoration Fields")] 
-    public InputField capThickField;
+
+    [Header("Decoration Fields")] public InputField capThickField;
     public InputField waterOffsetField;
     public Dropdown substrateDropdown;
-    
-    
-    [Header("Text Output Fields")]
-    public Text tankCapacityText;
+
+
+    [Header("Text Output Fields")] public Text tankCapacityText;
     public Text tankSafetyFactor;
     public Text tankDeflection;
-public Text substrateAmtText;
-public Text waterAmtText;
+    public Text substrateAmtText;
+    public Text waterAmtText;
 
     // parameters from user
     private float _glassThickness;
@@ -41,6 +37,7 @@ public Text waterAmtText;
     private CameraController _camController;
 
     private Hashtable _substrates;
+
     public void SetSubstrates(Hashtable subs)
     {
         _substrates = subs;
@@ -48,10 +45,9 @@ public Text waterAmtText;
 
     private const float INCH_2_M = 0.0254f;
     private const float MAT_THICKNESS = (3f / 8f) * 0.0254f;
-    private const float GRAVEL_DENSITY = 3703.80225f;   // lb / m^3
-    private const float GLASS_TENSILE_STR = 19f;        // MPa
-    private const float GLASS_MOD_ELASTICITY = 69000f;  // MPa
-    private const float ACRYLIC_TENSILE_STR = 64.8f;    // MPa
+    private const float GLASS_TENSILE_STR = 19f; // MPa
+    private const float GLASS_MOD_ELASTICITY = 69000f; // MPa
+    private const float ACRYLIC_TENSILE_STR = 64.8f; // MPa
     private const float ACRYLIC_MOD_ELASTICITY = 2760f; // MPa
 
     private void Awake()
@@ -78,9 +74,10 @@ public Text waterAmtText;
         }
         else
         {
-            _glassThickness = 0.25f*INCH_2_M;
+            _glassThickness = 0.25f * INCH_2_M;
             glassThickField.text = (0.25f).ToString("F2");
         }
+
         // get tank dimensions
         if (float.TryParse(tankDimX.text, out _tankDimensions.x))
         {
@@ -88,28 +85,30 @@ public Text waterAmtText;
         }
         else
         {
-            _tankDimensions.x = 20.25f*INCH_2_M;
+            _tankDimensions.x = 20.25f * INCH_2_M;
             tankDimX.text = (20.25f).ToString("F2");
         }
+
         if (float.TryParse(tankDimY.text, out _tankDimensions.y))
         {
             _tankDimensions.y *= INCH_2_M;
         }
         else
         {
-            _tankDimensions.y = 12.5f*INCH_2_M;
+            _tankDimensions.y = 12.5f * INCH_2_M;
             tankDimY.text = (12.5f).ToString("F2");
         }
+
         if (float.TryParse(tankDimZ.text, out _tankDimensions.z))
         {
             _tankDimensions.z *= INCH_2_M;
         }
         else
         {
-            _tankDimensions.z = 10.50f*INCH_2_M;
+            _tankDimensions.z = 10.50f * INCH_2_M;
             tankDimZ.text = (10.50f).ToString("F2");
         }
-        
+
         /* - update the tank object - */
         // neoprene mat --
         // set position
@@ -157,7 +156,7 @@ public Text waterAmtText;
 
         // update the decorations accordingly
         UpdateInternals();
-        
+
         // updates camera distance
         //UpdateCamPos();
         _camController.PlaceCamera();
@@ -171,7 +170,7 @@ public Text waterAmtText;
             tankObj.transform.GetChild(4).position.y + 0.2f,
             newZoom
         );
-        
+
         //Quaternion camTargetRot = Quaternion.Euler(15f, 0, 0);
         //StartCoroutine(MoveCamera(camTargetPos, camTargetRot));
         StartCoroutine(MoveCamera(camTargetPos));
@@ -181,6 +180,7 @@ public Text waterAmtText;
     private static readonly Color ColorBad = new Color(0.9f, 0.1f, 0.0f);
     private static readonly Color ColorNorm = new Color(0.1f, 0.1f, 0.1f);
     private static readonly Color ColorWarn = new Color(1.0f, 0.7f, 0.0f);
+
     public void UpdateInfoText()
     {
         // calculate internal capacity
@@ -202,27 +202,27 @@ public Text waterAmtText;
         if (safeFactor < 3.0f) tankSafetyFactor.color = ColorBad;
         else if (safeFactor <= 3.5f) tankSafetyFactor.color = ColorWarn;
         else tankSafetyFactor.color = ColorNorm;
-        
+
         // update deflection
         float defl = CalculateDeflection();
         tankDeflection.text = "~" + defl.ToString("F2") + " mm";
         // set text color based on value
-        if (defl >= 2.5f) tankDeflection.color = ColorBad;
+        if (defl >= 3f) tankDeflection.color = ColorBad;
         else if (defl >= 1f) tankDeflection.color = ColorWarn;
         else tankDeflection.color = ColorNorm;
-        
+
         // update substrate weight estimate
         float subAmt = decorObj.transform.GetChild(0).localScale.x *
                        decorObj.transform.GetChild(0).localScale.y *
                        decorObj.transform.GetChild(0).localScale.z;
-        subAmt*=float.Parse(_substrates[substrateDropdown.captionText.text].ToString());
+        subAmt *= float.Parse(_substrates[substrateDropdown.captionText.text].ToString());
         substrateAmtText.text = "~" + subAmt.ToString("F1") + " lbs";
 
         // update water capacity estimate
         // internal volume in m^3
         float watVol = (_tankDimensions.x - 2 * _glassThickness) *
                        (_tankDimensions.z - 2 * _glassThickness) *
-                       (_tankDimensions.y - _glassThickness-_waterOffset);
+                       (_tankDimensions.y - _glassThickness - _waterOffset);
         // capacity in liters
         float watVolL = watVol * 1000f;
         // capacity in gallons
@@ -269,18 +269,22 @@ public Text waterAmtText;
         // update material
         string path = "Materials/M_" + substrateDropdown.captionText.text;
         //Debug.Log(path);
-        decorObj.transform.GetChild(0).GetComponent<MeshRenderer>().material =
-            Resources.Load<Material>(path);
+        Material newMat = Resources.Load<Material>(path);
+        decorObj.transform.GetChild(0).GetComponent<MeshRenderer>().material = newMat;
+        Vector2 newTScale = new Vector2(
+            newScale.x * 1.5f,
+            newScale.z * 1.5f);
+        newMat.SetTextureScale("_BaseMap", newTScale);
 
         // update water
-        float waterDepth = _tankDimensions.y - _waterOffset - _capThickness- _glassThickness;
+        float waterDepth = _tankDimensions.y - _waterOffset - _capThickness - _glassThickness;
         decorObj.transform.GetChild(1).localPosition =
             Vector3.up * (MAT_THICKNESS + _glassThickness + _capThickness + waterDepth * 0.5f);
         decorObj.transform.GetChild(1).localScale = new Vector3(
             _tankDimensions.x - _glassThickness * 2f,
             waterDepth,
             _tankDimensions.z - _glassThickness * 2f);
-        
+
         // update other internal decorations
         for (int i = 2; i < decorObj.transform.childCount; i++)
             decorObj.transform.GetChild(i).position = new Vector3(
@@ -318,17 +322,18 @@ public Text waterAmtText;
     {
         // Deflection = (alpha x Water Pressure (p) x 0.000001 x Height^4) / (Modulus of Elasticity (E) x Thickness^3)
         //      water pressure (p) = Height * 9.81
-        
+
         // calc L/H ratio; clamped between 0.5 and 3
         float lhRatio = Mathf.Max(0.5f, Mathf.Min(_tankDimensions.x / _tankDimensions.y, 3f));
         // calculate beta value for glass safety factor
-        float alpha = -0.0199f + 0.0445f * lhRatio + 0.0001f * lhRatio * lhRatio - 0.0018f * lhRatio * lhRatio * lhRatio;
-        
+        float alpha = -0.0199f + 0.0445f * lhRatio + 0.0001f * lhRatio * lhRatio -
+                      0.0018f * lhRatio * lhRatio * lhRatio;
+
         // convert to mm
         float t = _glassThickness * 1000f; // thickness
         float h = _tankDimensions.y * 1000f; // height of tank
         float p = h * 9.81f;
-        
+
         // calculate the safety factor ---
         if (materialField.isOn)
             return alpha * p * 0.000001f * Mathf.Pow(h, 4) / (ACRYLIC_MOD_ELASTICITY * Mathf.Pow(t, 3));

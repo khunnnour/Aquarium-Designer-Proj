@@ -1,9 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.UI;
 
 public class DecoPlacer : MonoBehaviour
 {
@@ -14,18 +9,18 @@ public class DecoPlacer : MonoBehaviour
     private Camera _mainCam;
     private Ray _mouseRay;
     private RaycastHit _mouseRayHit;
-    private Transform _clampObj;
+    private Transform _clampObjTran;
     private GameObject _objToPlace;
     private GameObject _prefabToPlace;
     private bool _placing, _moving;
-    private Vector3 _moveAxis;
+    private Vector3 _moveAxis, _shiftOff;
 
     // Start is called before the first frame update
     void Start()
     {
         _mainCam = Camera.main;
 
-        _clampObj = DesignerManager.Instance.decorObj.transform.GetChild(0);
+        _clampObjTran = DesignerManager.Instance.decorObj.transform.GetChild(0);
 
         _placing = false;
         _moving = false;
@@ -57,6 +52,61 @@ public class DecoPlacer : MonoBehaviour
 
     private void Shift()
     {
+        // get new position
+        Vector3 newPos = FindClosestPointOnLine() + _shiftOff;
+
+        Transform oT = _objToPlace.transform;
+        // set the position of the object 
+        oT.position = newPos;
+
+        // adjust to be in tank
+        oT.position += VerifyInTank();
+        moveHandleObj.transform.position = oT.position;
+    }
+
+    // returns the offset to keep it fully in the tank, or a zero vector if no adjustment is needed
+    Vector3 VerifyInTank()
+    {
+        // bounds of the object of interest
+        Bounds objBounds = _objToPlace.gameObject.GetComponent<Renderer>().bounds;
+        // bounds of substrate 
+        Bounds intBounds = _clampObjTran.gameObject.GetComponent<Collider>().bounds;
+
+        // see if inside glass
+        // center diff for determining sign of adjustment
+        Vector3 diff = objBounds.center - intBounds.center;
+        // x-axis
+        float x = intBounds.extents.x -
+                  (Mathf.Abs(intBounds.center.x) + Mathf.Abs(objBounds.center.x) + objBounds.extents.x);
+        if (x > 0) x = 0; // disregard if not out of bounds
+
+        // z-axis
+        float z = intBounds.extents.z -
+                  (Mathf.Abs(intBounds.center.z) + Mathf.Abs(objBounds.center.z) + objBounds.extents.z);
+        if (z > 0) z = 0; // disregard if not out of bounds
+
+        // y-axis -- make sure bottom face of bounds is intersecting w substrate 
+        float yMin = intBounds.center.y - intBounds.extents.y + 0.005f;
+        float yMax = intBounds.center.y + intBounds.extents.y - 0.005f;
+        float y = Mathf.Min(Mathf.Max(objBounds.center.y - objBounds.extents.y, yMin), yMax) + objBounds.extents.y -
+                  objBounds.center.y;
+        //if (y > 0) y = 0; // disregard if not out of bounds
+
+        Vector3 backShift = new Vector3(
+            Mathf.Sign(diff.x) * x,
+            y,
+            Mathf.Sign(diff.z) * z);
+        //Mathf.Sign(objBounds.center.y - objBounds.extents.y - Mathf.Abs(intBounds.center.y)) * y
+
+        Debug.Log(y.ToString("F3"));
+        //Debug.Log(y + " * " + Mathf.Sign(objBounds.center.y - objBounds.extents.y - Mathf.Abs(intBounds.center.y)));
+
+        return backShift;
+    }
+
+    // find closest point on axis based on mouse position
+    Vector3 FindClosestPointOnLine()
+    {
         // find closest point on skew lines mouse ray and move axis 
         //   move axis: v1 = p1 + d1
         //   mouse ray: v2 = p2 + d2
@@ -65,22 +115,23 @@ public class DecoPlacer : MonoBehaviour
 
         // get perpendicular ray
         Vector3 n = Vector3.Cross(_moveAxis, _mouseRay.direction);
-        Vector3 n1 = Vector3.Cross(_moveAxis, n);
+        //Vector3 n1 = Vector3.Cross(_moveAxis, n);
         Vector3 n2 = Vector3.Cross(_mouseRay.direction, n);
 
         // find closest point
         Vector3 c1 = p1 + _moveAxis * (
             Vector3.Dot(_mouseRay.origin - p1, n2) /
             Vector3.Dot(_moveAxis, n2));
-        Vector3 c2 = _mouseRay.origin + _mouseRay.direction * (
-            Vector3.Dot(p1 - _mouseRay.origin, n1) /
-            Vector3.Dot(_mouseRay.direction, n1));
+        //Vector3 c2 = _mouseRay.origin + _mouseRay.direction * (
+        //    Vector3.Dot(p1 - _mouseRay.origin, n1) /
+        //    Vector3.Dot(_mouseRay.direction, n1));
 
-        moveHandleObj.transform.position = c1;
-        
-        Debug.DrawRay(_mouseRay.origin, _mouseRay.direction * 2f);
-        Debug.DrawRay(p1, _moveAxis * 2f);
-        Debug.DrawLine(c1, c2, Color.red);
+
+        //Debug.DrawRay(_mouseRay.origin, _mouseRay.direction * 2f);
+        //Debug.DrawRay(p1, _moveAxis * 2f);
+        //Debug.DrawLine(c1, c2, Color.red);
+
+        return c1;
     }
 
     void HandleMoving()
@@ -96,6 +147,8 @@ public class DecoPlacer : MonoBehaviour
                 {
                     _moving = true;
                     _moveAxis = _mouseRayHit.transform.GetComponent<Handle>()._axis;
+                    // get shift offset using relative positions of init 'grab' location and current pos of handle
+                    _shiftOff = _objToPlace.transform.position - FindClosestPointOnLine();
                 }
                 else // otherwise clear selection
                 {
@@ -105,9 +158,9 @@ public class DecoPlacer : MonoBehaviour
             else
             {
                 // otherwise, see if clicked a valid object to move
-                if (_mouseRayHit.transform&&_mouseRayHit.transform.CompareTag("Decor"))
+                if (_mouseRayHit.transform && _mouseRayHit.transform.CompareTag("Decor"))
                 {
-                    _moving = true;
+                    //_moving = true;
                     _objToPlace = _mouseRayHit.transform.gameObject;
                     moveHandleObj.transform.position = _objToPlace.transform.position;
                     moveHandleObj.SetActive(true);
@@ -152,13 +205,13 @@ public class DecoPlacer : MonoBehaviour
 
     void UpdateObject()
     {
-        Vector3 constraints = _clampObj.localScale * 0.5f;
+        Vector3 constraints = _clampObjTran.localScale * 0.5f;
 
         // location is where the raycast hit
         Vector3 newPos = _mouseRayHit.point;
         // clamp values to decor object
         newPos.x = Mathf.Min(constraints.x, Mathf.Max(-constraints.x, newPos.x));
-        newPos.y = _clampObj.position.y + constraints.y + 0.01f;
+        newPos.y = _clampObjTran.position.y + constraints.y + 0.01f;
         newPos.z = Mathf.Min(constraints.z, Mathf.Max(-constraints.z, newPos.z));
 
         //Debug.Log(newPos);
