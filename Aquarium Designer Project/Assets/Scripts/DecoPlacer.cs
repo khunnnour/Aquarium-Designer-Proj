@@ -98,7 +98,7 @@ public class DecoPlacer : MonoBehaviour
             Mathf.Sign(diff.z) * z);
         //Mathf.Sign(objBounds.center.y - objBounds.extents.y - Mathf.Abs(intBounds.center.y)) * y
 
-        Debug.Log(y.ToString("F3"));
+        //Debug.Log(y.ToString("F3"));
         //Debug.Log(y + " * " + Mathf.Sign(objBounds.center.y - objBounds.extents.y - Mathf.Abs(intBounds.center.y)));
 
         return backShift;
@@ -209,15 +209,15 @@ public class DecoPlacer : MonoBehaviour
 
         // location is where the raycast hit
         Vector3 newPos = _mouseRayHit.point;
-        // clamp values to decor object
-        newPos.x = Mathf.Min(constraints.x, Mathf.Max(-constraints.x, newPos.x));
-        newPos.y = _clampObjTran.position.y + constraints.y + 0.01f;
-        newPos.z = Mathf.Min(constraints.z, Mathf.Max(-constraints.z, newPos.z));
+		// clamp values to decor object
+		newPos.x = Mathf.Min(constraints.x, Mathf.Max(-constraints.x, newPos.x));
+		newPos.y = _clampObjTran.position.y + constraints.y + 0.01f;
+		newPos.z = Mathf.Min(constraints.z, Mathf.Max(-constraints.z, newPos.z));
 
-        //Debug.Log(newPos);
+		//Debug.Log(newPos);
 
-        // set object you are placing to that location
-        _objToPlace.transform.position = newPos;
+		// set object you are placing to that location
+		_objToPlace.transform.position = newPos;
     }
 
     public void FindObjectToPlace(string objName)
@@ -243,8 +243,9 @@ public class DecoPlacer : MonoBehaviour
     {
         // put on regular layer
         _objToPlace.layer = LayerMask.NameToLayer("Default");
-        // clear object to place
-        _objToPlace = null;
+		_objToPlace.transform.position += VerifyInTank();
+		// clear object to place
+		_objToPlace = null;
         // clear placing
         _placing = false;
     }
