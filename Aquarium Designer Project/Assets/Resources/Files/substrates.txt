@@ -1,5 +1,4 @@
 Name,density (lb/m3)
 Gravel,3703.80225
 Sand,3392.92017
-Aqua Soil,1263.19150
 Dirt,1653.467
