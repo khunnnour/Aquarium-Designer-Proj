@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3683549889024745593}
   - component: {fileID: 3683549889024745594}
   m_Layer: 0
-  m_Name: StyrofoamBlock
+  m_Name: Styrofoam
   m_TagString: Decor
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

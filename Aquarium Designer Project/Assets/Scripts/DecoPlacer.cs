@@ -2,7 +2,9 @@ using UnityEngine;
 
 public class DecoPlacer : MonoBehaviour
 {
-    public GameObject moveHandleObj;
+	public static DecoPlacer Instance;
+
+	public GameObject moveHandleObj;
 
     private const string ASSET_PATH = "Prefabs/";
 
@@ -15,8 +17,13 @@ public class DecoPlacer : MonoBehaviour
     private bool _placing, _moving;
     private Vector3 _moveAxis, _shiftOff;
 
-    // Start is called before the first frame update
-    void Start()
+	private void Awake()
+	{
+		Instance = this;
+	}
+
+	// Start is called before the first frame update
+	void Start()
     {
         _mainCam = Camera.main;
 
