@@ -36,7 +36,12 @@ public class FileLoader : MonoBehaviour
 		for (int i = 1; i < lines.Length; i++)
 		{
 			string[] elements = lines[i].Split(',');
-			substrates.Add(elements[0], float.Parse(elements[1]));
+			Props newProps = new Props
+			{
+				density = float.Parse(elements[1]), 
+				porosity = float.Parse(elements[2])
+			};
+			substrates.Add(elements[0], newProps);
 			options.Add(new Dropdown.OptionData(elements[0]));
 		}
 
@@ -60,7 +65,7 @@ public class FileLoader : MonoBehaviour
 
 			// get thumbnail
 			Sprite thumb = Resources.Load<Sprite>(THUMBS_PATH + "T_" + line);
-			Debug.Log(THUMBS_PATH + "T_" + line + " as a sprite");
+			//Debug.Log(THUMBS_PATH + "T_" + line + " as a sprite");
 
 			// create and an entry for it
 			GameObject newItem = Instantiate<GameObject>(decorItemPrefab, decorObjsPanel.transform);

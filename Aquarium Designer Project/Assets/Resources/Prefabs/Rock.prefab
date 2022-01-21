@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5252309015478345575}
   - component: {fileID: 9172751268704424130}
   - component: {fileID: 6388602242076042248}
-  - component: {fileID: 4875185715804849628}
+  - component: {fileID: 6850026732095213036}
   m_Layer: 0
   m_Name: Rock
   m_TagString: Decor
@@ -27,7 +27,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4875185715804849629}
   m_LocalRotation: {x: -0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: -0.3702184, y: 1.0877, z: 0.091860265}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.9, y: 0.9, z: 0.9}
   m_Children: []
   m_Father: {fileID: 0}
@@ -82,7 +82,7 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!64 &4875185715804849628
+--- !u!64 &6850026732095213036
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

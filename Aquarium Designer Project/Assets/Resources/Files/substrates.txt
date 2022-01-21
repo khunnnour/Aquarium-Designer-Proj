@@ -1,4 +1,4 @@
-Name,density (lb/m3)
-Gravel,3703.80225
-Sand,3392.92017
-Dirt,1653.467
+Name,density (lb/m3),porosity [0,1],SSA (m2/m3)
+Gravel,3703.80225,0.35,300.0
+Sand,3492.871805,0.35,1000.0
+Dirt,1653.467,0.5,1000.0
