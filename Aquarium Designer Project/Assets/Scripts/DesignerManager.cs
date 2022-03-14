@@ -20,6 +20,7 @@ public class DesignerManager : MonoBehaviour
     public InputField tankDimX;
     public InputField tankDimY;
     public InputField tankDimZ;
+	public Transform tankSidePanelObj;
 
     [Header("Decoration Fields")] public InputField capThickField;
     public InputField waterOffsetField;
@@ -50,12 +51,7 @@ public class DesignerManager : MonoBehaviour
     }
 
     private const float INCH_2_M = 0.0254f; // in/m
-    private const float MAT_THICKNESS = (3f / 8f) * INCH_2_M; // m
-    private const float GLASS_TENSILE_STR = 19f; // MPa
-    private const float GLASS_MOD_ELASTICITY = 69000f; // MPa
-    private const float ACRYLIC_TENSILE_STR = 64.8f; // MPa
-    private const float ACRYLIC_MOD_ELASTICITY = 2760f; // MPa
-    
+    private const float MAT_THICKNESS = (3f / 8f) * INCH_2_M; // m    
 
     private void Awake()
     {
@@ -202,7 +198,7 @@ public class DesignerManager : MonoBehaviour
         // update the text
         tankCapacityText.text = "~" + gallonCap.ToString("F1") + " gal (" + literCap.ToString("F1") + " L)";
 
-        // update safety factor --
+        // -- update safety factor -- //
         float safeFactor = TankSpecCalculator.CalculateSafetyFactor(_tankDimensions, _glassThickness, materialField.isOn);
         tankSafetyFactor.text = "~" + safeFactor.ToString("F2");
         // set text color based on value
@@ -218,8 +214,45 @@ public class DesignerManager : MonoBehaviour
         else if (defl >= 1f) tankDeflection.color = ColorWarn;
         else tankDeflection.color = ColorNorm;
 
-        // get substrate properties from hashtable
-        Props p = (Props) _substrates[substrateDropdown.captionText.text];
+
+		// -- update glass panel dimensions -- //
+		Vector2 botP, frontP, sideP;
+		TankSpecCalculator.CalculateSidePanelDimensions(_tankDimensions, _glassThickness, out botP, out frontP, out sideP);
+		//Debug.Log(botP.ToString("F3") + " | " + frontP.ToString("F3") + " | " + sideP.ToString("F3"));
+
+		float in_2_px_scale = 140f/(botP.y + 2f * frontP.y);
+
+		// update the bottom panel
+		Vector2 botPxDim = botP * in_2_px_scale;
+		tankSidePanelObj.GetChild(0).GetComponent<RectTransform>().sizeDelta = botPxDim;
+		tankSidePanelObj.GetChild(0).GetChild(0).GetComponent<Text>().text = botP.x + " x " + botP.y;
+
+		// update front panel(s)
+		Vector2 newSize = frontP * in_2_px_scale;
+		Vector2 newpos = new Vector2(0f, (newSize.y + botPxDim.y) * 0.5f + 5f);
+		tankSidePanelObj.GetChild(1).GetComponent<RectTransform>().sizeDelta = newSize;
+		tankSidePanelObj.GetChild(1).GetComponent<RectTransform>().anchoredPosition = newpos;
+		tankSidePanelObj.GetChild(1).GetChild(0).GetComponent<Text>().text = frontP.x + " x " + frontP.y;
+		newpos *= -1;
+		tankSidePanelObj.GetChild(2).GetComponent<RectTransform>().sizeDelta = newSize;
+		tankSidePanelObj.GetChild(2).GetComponent<RectTransform>().anchoredPosition = newpos;
+		tankSidePanelObj.GetChild(2).GetChild(0).GetComponent<Text>().text = frontP.x + " x " + frontP.y;
+
+		// update side panel(s)
+		newSize = new Vector2(sideP.y, sideP.x) * in_2_px_scale;
+		newpos = new Vector2((newSize.x + botPxDim.x) * 0.5f + 5f, 0);
+		tankSidePanelObj.GetChild(3).GetComponent<RectTransform>().sizeDelta = newSize;
+		tankSidePanelObj.GetChild(3).GetComponent<RectTransform>().anchoredPosition = newpos;
+		tankSidePanelObj.GetChild(3).GetChild(0).GetComponent<Text>().text = sideP.x + " x " + sideP.y;
+		newpos *= -1;
+		tankSidePanelObj.GetChild(4).GetComponent<RectTransform>().sizeDelta = newSize;
+		tankSidePanelObj.GetChild(4).GetComponent<RectTransform>().anchoredPosition = newpos;
+		tankSidePanelObj.GetChild(4).GetChild(0).GetComponent<Text>().text = sideP.x + " x " + sideP.y;
+
+
+
+		// get substrate properties from hashtable
+		Props p = (Props) _substrates[substrateDropdown.captionText.text];
 
         /* -  update substrate weight estimate - */
         // get volume of substrate
