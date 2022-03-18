@@ -36,7 +36,7 @@ public class FileLoader : MonoBehaviour
 		for (int i = 1; i < lines.Length; i++)
 		{
 			string[] elements = lines[i].Split(',');
-			Props newProps = new Props
+			SubstrateProperties newProps = new SubstrateProperties
 			{
 				density = float.Parse(elements[1]), 
 				porosity = float.Parse(elements[2])

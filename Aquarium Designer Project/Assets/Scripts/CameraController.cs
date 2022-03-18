@@ -1,7 +1,3 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public class CameraController : MonoBehaviour
@@ -13,8 +9,8 @@ public class CameraController : MonoBehaviour
     private Vector3 _lastMousePos;
 
     private float _currZoom = 1f; // [0,1]
-    private float _minZoom = 0.6f;
-    private float _maxZoom = 3.0f;
+    private float _minZoom = 0.5f;
+    private float _maxZoom = 3.2f;
 
     // Start is called before the first frame update
     void Start()
@@ -42,8 +38,8 @@ public class CameraController : MonoBehaviour
         diff.x /= Screen.width;
         diff.y /= Screen.height;
 
-        // if left mouse is pressed, then orbit
-        if (Input.GetMouseButton(2))
+        // if right mouse is pressed, then orbit
+        if (Input.GetMouseButton(1))
         {
             // rotate camera
             diff *= 90f;
@@ -118,10 +114,4 @@ public class CameraController : MonoBehaviour
         // update position
         transform.position = _targetLookPos - lookDir * zoom;
     }
-
-    //private void OnDrawGizmos()
-    //{
-    //    Gizmos.color = Color.green;
-    //    Gizmos.DrawWireSphere(_targetLookPos, 0.1f);
-    //}
 }
