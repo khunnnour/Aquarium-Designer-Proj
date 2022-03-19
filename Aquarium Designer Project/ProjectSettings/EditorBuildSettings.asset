@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/meshGenTestScene.unity
+    path: Assets/Scenes/BasicDimensionScene.unity
+    guid: 70d618b05729fb24eabb330453a0a27e
+  - enabled: 1
+    path: Assets/Scenes/MainVisualScene.unity
     guid: 8efe08fc0a015a94893520973eb8da71
   m_configObjects: {}

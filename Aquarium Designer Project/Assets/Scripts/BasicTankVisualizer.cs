@@ -2,26 +2,29 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class DesignerManager : MonoBehaviour
+public struct SubstrateProperties
 {
-	public static DesignerManager Instance;
+    public float density;
+    public float porosity;
+}
 
-	[Header("Object References")] public GameObject tankObj;
-	public GameObject decorObj;
+public class BasicTankVisualizer : MonoBehaviour
+{
+	public static BasicTankVisualizer Instance;
 
-	[Header("Tank Spec Fields")] public Dropdown materialField;
+	[Header("Object References")]
+	public GameObject tankObj;
+
+	[Header("Tank Spec Fields")]
+	public Dropdown materialField;
 	public InputField glassThickField;
 	public InputField tankDimX;
 	public InputField tankDimY;
 	public InputField tankDimZ;
 	public Transform tankSidePanelObj;
 
-	[Header("Decoration Fields")] public InputField capThickField;
-	public InputField waterOffsetField;
-	public Dropdown substrateDropdown;
-
-
-	[Header("Text Output Fields")] public Text tankCapacityText;
+	[Header("Text Output Fields")]
+	public Text tankCapacityText;
 	public Text tankSafetyFactor;
 	public Text tankDeflection;
 	public Text substrateAmtText;
@@ -29,23 +32,11 @@ public class DesignerManager : MonoBehaviour
 
 	// parameters from user
 	private float _glassThickness;
-	private float _capThickness = 0.03f;
-	private float _waterOffset = 1f;
 	private Vector3 _tankDimensions;
-
-	// other stuff
-	private Transform _camTran;
-	private CameraController _camController;
-
-	private Hashtable _substrates;
 
 	private SheetMaterial _constructionMat;
 
 
-	public void SetSubstrates(Hashtable subs)
-	{
-		_substrates = subs;
-	}
 
 	private const float INCH_2_M = 0.0254f; // in/m
 	private const float MAT_THICKNESS = (3f / 8f) * INCH_2_M; // m    
@@ -58,9 +49,6 @@ public class DesignerManager : MonoBehaviour
 
 	private void Start()
 	{
-		_camTran = Camera.main.transform;
-		_camController = Camera.main.GetComponent<CameraController>();
-
 		UpdateTank();
 	}
 
@@ -153,27 +141,6 @@ public class DesignerManager : MonoBehaviour
 		);
 		tankObj.transform.GetChild(4).transform.localScale = newscale;
 		tankObj.transform.GetChild(5).transform.localScale = newscale;
-
-		// update the decorations accordingly
-		UpdateInternals();
-
-		// updates camera distance
-		//UpdateCamPos();
-		_camController.PlaceCamera();
-	}
-
-	void UpdateCamPos()
-	{
-		float newZoom = -0.489f * _tankDimensions.x + -0.562f;
-		// Update Camera Position
-		Vector3 camTargetPos = new Vector3(0,
-			tankObj.transform.GetChild(4).position.y + 0.2f,
-			newZoom
-		);
-
-		//Quaternion camTargetRot = Quaternion.Euler(15f, 0, 0);
-		//StartCoroutine(MoveCamera(camTargetPos, camTargetRot));
-		StartCoroutine(MoveCamera(camTargetPos));
 	}
 
 	// updates the labels for the main panel labels
@@ -248,114 +215,7 @@ public class DesignerManager : MonoBehaviour
 		tankSidePanelObj.GetChild(4).GetComponent<RectTransform>().anchoredPosition = newpos;
 		tankSidePanelObj.GetChild(4).GetChild(0).GetComponent<Text>().text = sideP.x + " x " + sideP.y;
 
-
-
-		// get substrate properties from hashtable
-		SubstrateProperties p = (SubstrateProperties)_substrates[substrateDropdown.captionText.text];
-
-		/* -  update substrate weight estimate - */
-		// get volume of substrate
-		float substrateVol = decorObj.transform.GetChild(0).localScale.x *
-							 decorObj.transform.GetChild(0).localScale.y *
-							 decorObj.transform.GetChild(0).localScale.z;
-		substrateAmtText.text = "~" + (substrateVol * p.density).ToString("F1") + " lbs";
-
-		/* - update water capacity estimate - */
-		// internal volume in m^3 of water column
-		float watVol = (_tankDimensions.x - 2 * _glassThickness) *
-					   (_tankDimensions.z - 2 * _glassThickness) *
-					   (_tankDimensions.y - _glassThickness - _waterOffset - _capThickness);
-		// volume of water in substrate
-		watVol += substrateVol * p.porosity;
-
-		// capacity in liters
-		float watVolL = watVol * 1000f;
-		// capacity in gallons
-		float watVolG = watVolL * 0.2641720524f;
-		// update the text
-		waterAmtText.text = "~" + watVolG.ToString("F1") + " gal (" + watVolL.ToString("F1") + " L)";
-	}
-
-	public void UpdateInternals()
-	{
-		// get thickness of cap substrate
-		if (float.TryParse(capThickField.text, out _capThickness))
-		{
-			_capThickness *= INCH_2_M;
-		}
-		else
-		{
-			// if invalid then use a default value
-			_capThickness = 1.5f * INCH_2_M;
-			capThickField.text = (_capThickness / INCH_2_M).ToString("F1");
-		}
-
-		// get water offset
-		if (float.TryParse(waterOffsetField.text, out _waterOffset))
-		{
-			_waterOffset *= INCH_2_M;
-		}
-		else
-		{
-			// if invalid then use a default value
-			_waterOffset = 1f * INCH_2_M;
-			waterOffsetField.text = (_waterOffset / INCH_2_M).ToString("F1");
-		}
-
-		// update cap substrate dimensions
-		decorObj.transform.GetChild(0).localPosition =
-			Vector3.up * (MAT_THICKNESS + _glassThickness + _capThickness * 0.5f);
-		Vector3 oldScale = decorObj.transform.GetChild(0).localScale;
-		Vector3 newScale = new Vector3(
-			_tankDimensions.x - _glassThickness * 2f,
-			_capThickness,
-			_tankDimensions.z - _glassThickness * 2f);
-		decorObj.transform.GetChild(0).localScale = newScale;
-		// update material
-		string path = "Materials/M_" + substrateDropdown.captionText.text;
-		//Debug.Log(path);
-		Material newMat = Resources.Load<Material>(path);
-		decorObj.transform.GetChild(0).GetComponent<MeshRenderer>().material = newMat;
-		//Vector2 newTScale = new Vector2(
-		//	newScale.x * 1.5f,
-		//	newScale.z * 1.5f);
-		//newMat.SetTextureScale("_BaseMap", newTScale);
-
-		// update water
-		float waterDepth = _tankDimensions.y - _waterOffset - _capThickness - _glassThickness;
-		decorObj.transform.GetChild(1).localPosition =
-			Vector3.up * (MAT_THICKNESS + _glassThickness + _capThickness + waterDepth * 0.5f);
-		decorObj.transform.GetChild(1).localScale = new Vector3(
-			_tankDimensions.x - _glassThickness * 2f,
-			waterDepth,
-			_tankDimensions.z - _glassThickness * 2f);
-
-		// update other internal decorations
-		for (int i = 2; i < decorObj.transform.childCount; i++)
-			decorObj.transform.GetChild(i).position = new Vector3(
-				decorObj.transform.GetChild(i).position.x / oldScale.x * newScale.x,
-				decorObj.transform.GetChild(0).position.y + newScale.y * 0.5f + 0.01f,
-				decorObj.transform.GetChild(i).position.z / oldScale.z * newScale.z
-			);
-
 		// update the info text
 		UpdateInfoText();
-	}
-
-	//IEnumerator MoveCamera(Vector3 tPos, Quaternion tRot)
-	IEnumerator MoveCamera(Vector3 tPos)
-	{
-		const float timeToTarget = 0.3f;
-
-		float t = 0;
-
-		Vector3 sPos = _camTran.position;
-		while (t <= timeToTarget)
-		{
-			t += Time.deltaTime;
-			_camTran.position = Vector3.Slerp(sPos, tPos, t / timeToTarget);
-			//_camTran.rotation = Quaternion.Slerp(sRot, tRot, t / timeToTarget);
-			yield return new WaitForEndOfFrame();
-		}
 	}
 }
