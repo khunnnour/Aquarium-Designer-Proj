@@ -12,31 +12,24 @@ public class BasicTankVisualizer : MonoBehaviour
 {
 	public static BasicTankVisualizer Instance;
 
-	[Header("Object References")]
-	public GameObject tankObj;
+	[Header("Object References")] public GameObject tankObj;
 
-	[Header("Tank Spec Fields")]
-	public Dropdown materialField;
+	[Header("Tank Spec Fields")] public Dropdown materialField;
 	public InputField glassThickField;
 	public InputField tankDimX;
 	public InputField tankDimY;
 	public InputField tankDimZ;
 	public Transform tankSidePanelObj;
 
-	[Header("Text Output Fields")]
-	public Text tankCapacityText;
+	[Header("Text Output Fields")] public Text tankCapacityText;
 	public Text tankSafetyFactor;
 	public Text tankDeflection;
-	public Text substrateAmtText;
-	public Text waterAmtText;
 
 	// parameters from user
 	private float _glassThickness;
 	private Vector3 _tankDimensions;
 
 	private SheetMaterial _constructionMat;
-
-
 
 	private const float INCH_2_M = 0.0254f; // in/m
 	private const float MAT_THICKNESS = (3f / 8f) * INCH_2_M; // m    
@@ -98,49 +91,45 @@ public class BasicTankVisualizer : MonoBehaviour
 		}
 
 		/* - update the tank object - */
-		// neoprene mat --
-		// set position
-		Vector3 matVertOffset = Vector3.up * MAT_THICKNESS;
-		tankObj.transform.GetChild(0).transform.localPosition = matVertOffset * 0.5f;
-		// set scale
-		tankObj.transform.GetChild(0).transform.localScale =
-			new Vector3(_tankDimensions.x, MAT_THICKNESS, _tankDimensions.z);
 		// update the base --
 		// set position
-		tankObj.transform.GetChild(1).transform.localPosition = Vector3.up * _glassThickness * 0.5f + matVertOffset;
+		tankObj.transform.GetChild(0).transform.localPosition = Vector3.up * _glassThickness * 0.5f;
 		// set scale
-		tankObj.transform.GetChild(1).transform.localScale =
+		tankObj.transform.GetChild(0).transform.localScale =
 			new Vector3(_tankDimensions.x, _glassThickness, _tankDimensions.z);
 
 		// update front/back sides
 		Vector3 newpos = new Vector3(0, (_tankDimensions.y + _glassThickness) * 0.5f,
-			(_tankDimensions.z - _glassThickness) * 0.5f) + matVertOffset;
-		tankObj.transform.GetChild(2).transform.localPosition = newpos;
+			(_tankDimensions.z - _glassThickness) * 0.5f);
+		tankObj.transform.GetChild(1).transform.localPosition = newpos;
 		newpos.z *= -1;
-		tankObj.transform.GetChild(3).transform.localPosition = newpos;
+		tankObj.transform.GetChild(2).transform.localPosition = newpos;
 
 		Vector3 newscale = new Vector3(
 			_tankDimensions.x,
 			_tankDimensions.y - _glassThickness,
 			_glassThickness
 		);
+		tankObj.transform.GetChild(1).transform.localScale = newscale;
 		tankObj.transform.GetChild(2).transform.localScale = newscale;
-		tankObj.transform.GetChild(3).transform.localScale = newscale;
 
 		// update left/right sides
 		newpos = new Vector3((_tankDimensions.x - _glassThickness) * 0.5f, (_tankDimensions.y + _glassThickness) * 0.5f,
-			0) + matVertOffset;
-		tankObj.transform.GetChild(4).transform.localPosition = newpos;
+			0);
+		tankObj.transform.GetChild(3).transform.localPosition = newpos;
 		newpos.x *= -1;
-		tankObj.transform.GetChild(5).transform.localPosition = newpos;
+		tankObj.transform.GetChild(4).transform.localPosition = newpos;
 
 		newscale = new Vector3(
 			_glassThickness,
 			_tankDimensions.y - _glassThickness,
 			_tankDimensions.z - _glassThickness * 2f
 		);
+		tankObj.transform.GetChild(3).transform.localScale = newscale;
 		tankObj.transform.GetChild(4).transform.localScale = newscale;
-		tankObj.transform.GetChild(5).transform.localScale = newscale;
+
+		// update the info text
+		UpdateInfoText();
 	}
 
 	// updates the labels for the main panel labels
@@ -153,8 +142,8 @@ public class BasicTankVisualizer : MonoBehaviour
 		// calculate total internal capacity --
 		// internal volume in m^3
 		float intVol = (_tankDimensions.x - 2 * _glassThickness) *
-					   (_tankDimensions.z - 2 * _glassThickness) *
-					   (_tankDimensions.y - _glassThickness);
+		               (_tankDimensions.z - 2 * _glassThickness) *
+		               (_tankDimensions.y - _glassThickness);
 		// capacity in liters
 		float literCap = intVol * 1000f;
 		// capacity in gallons
@@ -162,7 +151,7 @@ public class BasicTankVisualizer : MonoBehaviour
 		// update the text
 		tankCapacityText.text = "~" + gallonCap.ToString("F1") + " gal (" + literCap.ToString("F1") + " L)";
 
-		_constructionMat = (SheetMaterial)materialField.value;
+		_constructionMat = (SheetMaterial) materialField.value;
 
 		// -- update safety factor -- //
 		float safeFactor = TankSpecCalculator.CalculateSafetyFactor(_tankDimensions, _glassThickness, _constructionMat);
@@ -182,11 +171,11 @@ public class BasicTankVisualizer : MonoBehaviour
 
 
 		// -- update glass panel dimensions -- //
-		Vector2 botP, frontP, sideP;
-		TankSpecCalculator.CalculateSidePanelDimensions(_tankDimensions, _glassThickness, out botP, out frontP, out sideP);
+		TankSpecCalculator.CalculateSidePanelDimensions(_tankDimensions, _glassThickness, out var botP, out var frontP,
+			out var sideP);
 		//Debug.Log(botP.ToString("F3") + " | " + frontP.ToString("F3") + " | " + sideP.ToString("F3"));
 
-		float in_2_px_scale = 140f / (botP.y + 2f * frontP.y);
+		float in_2_px_scale = 250f / (botP.y + 2f * frontP.y);
 
 		// update the bottom panel
 		Vector2 botPxDim = botP * in_2_px_scale;
@@ -214,8 +203,5 @@ public class BasicTankVisualizer : MonoBehaviour
 		tankSidePanelObj.GetChild(4).GetComponent<RectTransform>().sizeDelta = newSize;
 		tankSidePanelObj.GetChild(4).GetComponent<RectTransform>().anchoredPosition = newpos;
 		tankSidePanelObj.GetChild(4).GetChild(0).GetComponent<Text>().text = sideP.x + " x " + sideP.y;
-
-		// update the info text
-		UpdateInfoText();
 	}
 }

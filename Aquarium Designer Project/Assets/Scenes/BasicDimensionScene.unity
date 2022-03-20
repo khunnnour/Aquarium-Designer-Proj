@@ -372,10 +372,10 @@ RectTransform:
   m_Father: {fileID: 214980401}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 1, y: 0.5}
-  m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -10, y: -0}
-  m_SizeDelta: {x: 400, y: 250}
+  m_AnchorMin: {x: 1, y: 0}
+  m_AnchorMax: {x: 1, y: 1}
+  m_AnchoredPosition: {x: -10, y: -100}
+  m_SizeDelta: {x: 400, y: -400}
   m_Pivot: {x: 1, y: 0.5}
 --- !u!1 &48038348
 GameObject:
@@ -400,8 +400,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 48038348}
-  m_LocalRotation: {x: -0.0987539, y: 0.20222503, z: -0.020311285, w: 0.97413564}
-  m_LocalPosition: {x: -0.586, y: -0.21, z: -0.05}
+  m_LocalRotation: {x: -0.093295604, y: 0.1690788, z: -0.027673226, w: 0.98078674}
+  m_LocalPosition: {x: -0.45, y: -0.2, z: -0.1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1466683830}
@@ -411,7 +411,7 @@ Transform:
   - {fileID: 1156322705}
   m_Father: {fileID: 0}
   m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: -10.614, y: 23.887, z: -4.64}
+  m_LocalEulerAnglesHint: {x: -10, y: 20, z: -5}
 --- !u!1 &84251492
 GameObject:
   m_ObjectHideFlags: 0
@@ -485,8 +485,8 @@ MonoBehaviour:
   m_OnEndEdit:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: DesignerManager, Assembly-CSharp
+      - m_Target: {fileID: 1899477465}
+        m_TargetAssemblyTypeName: BasicTankVisualizer, Assembly-CSharp
         m_MethodName: UpdateTank
         m_Mode: 1
         m_Arguments:
@@ -1436,8 +1436,8 @@ MonoBehaviour:
   m_OnEndEdit:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: DesignerManager, Assembly-CSharp
+      - m_Target: {fileID: 1899477465}
+        m_TargetAssemblyTypeName: BasicTankVisualizer, Assembly-CSharp
         m_MethodName: UpdateTank
         m_Mode: 1
         m_Arguments:
@@ -1899,7 +1899,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 984fd5183694ec64793d86e95f27d9f2, type: 2}
+  - {fileID: 2100000, guid: 3e67450dc0ad3eb4f88deea019becbb3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2078,8 +2078,8 @@ MonoBehaviour:
   m_OnEndEdit:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: DesignerManager, Assembly-CSharp
+      - m_Target: {fileID: 1899477465}
+        m_TargetAssemblyTypeName: BasicTankVisualizer, Assembly-CSharp
         m_MethodName: UpdateTank
         m_Mode: 1
         m_Arguments:
@@ -2582,7 +2582,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 984fd5183694ec64793d86e95f27d9f2, type: 2}
+  - {fileID: 2100000, guid: 3e67450dc0ad3eb4f88deea019becbb3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3459,7 +3459,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 984fd5183694ec64793d86e95f27d9f2, type: 2}
+  - {fileID: 2100000, guid: 3e67450dc0ad3eb4f88deea019becbb3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3562,8 +3562,8 @@ MonoBehaviour:
   m_OnEndEdit:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: DesignerManager, Assembly-CSharp
+      - m_Target: {fileID: 1899477465}
+        m_TargetAssemblyTypeName: BasicTankVisualizer, Assembly-CSharp
         m_MethodName: UpdateTank
         m_Mode: 1
         m_Arguments:
@@ -3718,8 +3718,8 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 1
-  far clip plane: 2.5
+  near clip plane: 0.5
+  far clip plane: 3
   field of view: 60
   orthographic: 0
   orthographic size: 0.75
@@ -4502,11 +4502,9 @@ MonoBehaviour:
   tankDimY: {fileID: 84251493}
   tankDimZ: {fileID: 844648882}
   tankSidePanelObj: {fileID: 47956904}
-  tankCapacityText: {fileID: 0}
-  tankSafetyFactor: {fileID: 0}
-  tankDeflection: {fileID: 0}
-  substrateAmtText: {fileID: 0}
-  waterAmtText: {fileID: 0}
+  tankCapacityText: {fileID: 907376497}
+  tankSafetyFactor: {fileID: 1421695007}
+  tankDeflection: {fileID: 266382107}
 --- !u!4 &1899477468
 Transform:
   m_ObjectHideFlags: 0
@@ -4598,9 +4596,9 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: DesignerManager, Assembly-CSharp
-        m_MethodName: UpdateInternals
+      - m_Target: {fileID: 1899477465}
+        m_TargetAssemblyTypeName: BasicTankVisualizer, Assembly-CSharp
+        m_MethodName: UpdateInfoText
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -4736,7 +4734,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 984fd5183694ec64793d86e95f27d9f2, type: 2}
+  - {fileID: 2100000, guid: 3e67450dc0ad3eb4f88deea019becbb3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
