@@ -125,9 +125,9 @@ public class BasicTankVisualizer : MonoBehaviour
 		tankObj.transform.GetChild(4).transform.localScale = newscale;
 
 		// now reposition the whole tank
-		float dist = _tankDimensions.x / INCH_2_M * 0.041f + 0.15f;
-		Vector3 pos = Camera.main.ScreenToWorldPoint(new Vector3(0.5f * Screen.width + tankSidePanelObj.GetComponent<RectTransform>().rect.height * 0.55f, 0.5f * Screen.height, dist));
-		tankObj.transform.position = pos + Vector3.down * _tankDimensions.y * 0.6f;
+		float dist = _tankDimensions.x / INCH_2_M * 0.033f + 0.25f;
+		Vector3 pos = Camera.main.ScreenToWorldPoint(new Vector3(0.475f * (Screen.width + tankSidePanelObj.GetComponent<RectTransform>().rect.height), 0.5f * Screen.height, dist));
+		tankObj.transform.position = pos + Vector3.down * _tankDimensions.y * 0.55f;
 		//Debug.Log(tankSidePanelObj.GetComponent<RectTransform>().rect.position);
 
 
@@ -221,7 +221,7 @@ public class BasicTankVisualizer : MonoBehaviour
 		TankSpecCalculator.CalculateSidePanelDimensions(_tankDimensions, _glassThickness, out var botP, out var frontP,
 			out var sideP);
 
-		tankSidePanelObj.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 1.1f * tankSidePanelObj.GetComponent<RectTransform>().rect.height);
+		tankSidePanelObj.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, tankSidePanelObj.GetComponent<RectTransform>().rect.height);
 
 		Vector2 sideRectSize = tankSidePanelObj.GetComponent<RectTransform>().rect.size;
 		float sideRectAR = sideRectSize.x / sideRectSize.y;
@@ -231,8 +231,8 @@ public class BasicTankVisualizer : MonoBehaviour
 
 		//Debug.Log(sideRectAR.ToString("F2")+ " | " + tankAR.ToString("F2"));
 
-		const float PX_SPACING = 5.0f;
-		float in_2_px_scale =	sideRectAR > tankAR ?
+		const float PX_SPACING = 7.0f;
+		float in_2_px_scale =	1 > tankAR ?
 								(sideRectSize.y - 4f * PX_SPACING) / (botP.y + 2f * frontP.y) :
 								(sideRectSize.x - 4f * PX_SPACING) / (botP.x + 2f * frontP.y);
 

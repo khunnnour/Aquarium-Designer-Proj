@@ -431,7 +431,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 48038348}
-  m_LocalRotation: {x: -0.06874046, y: 0.38045505, z: 0.004911616, w: 0.92222804}
+  m_LocalRotation: {x: -0.097073704, y: 0.37735206, z: -0.0068243966, w: 0.9209428}
   m_LocalPosition: {x: 0.574, y: -0.24, z: 1.39}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -442,7 +442,7 @@ Transform:
   - {fileID: 1156322705}
   m_Father: {fileID: 0}
   m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: -7.5, y: 45, z: -2.5}
+  m_LocalEulerAnglesHint: {x: -10, y: 45, z: -5}
 --- !u!1 &84251492
 GameObject:
   m_ObjectHideFlags: 0
@@ -1383,7 +1383,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 0.7058824, b: 0.74509805, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1944,7 +1944,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: cc9f2c1bcf0b258439ab3c7d291c6379, type: 2}
+  - {fileID: 2100000, guid: d315e26c66d53b543a5b4427d12893a1, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -3504,7 +3504,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: cc9f2c1bcf0b258439ab3c7d291c6379, type: 2}
+  - {fileID: 2100000, guid: 62a82821ede38b54ba4158d7bcd0b317, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -4006,7 +4006,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.74509805, g: 1, b: 0.7254902, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -4550,15 +4550,6 @@ MonoBehaviour:
   tankCapacityText: {fileID: 907376497}
   tankSafetyFactor: {fileID: 1421695007}
   tankDeflection: {fileID: 266382107}
-  lines:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
 --- !u!4 &1899477468
 Transform:
   m_ObjectHideFlags: 0
@@ -4788,7 +4779,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: cc9f2c1bcf0b258439ab3c7d291c6379, type: 2}
+  - {fileID: 2100000, guid: cbccd6fdfdd1bdd4985ad2baef45fd01, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -5019,7 +5010,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.7058824, g: 0.7254902, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
