@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4eecb805a6777dc4093736fc66361fda, type: 3}
   m_Name: Outline
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0
   settings:
     outlineMaterial: {fileID: 2100000, guid: 984fd5183694ec64793d86e95f27d9f2, type: 2}
 --- !u!114 &11400000
@@ -71,4 +71,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9044da2c803ed4d40b9a615381d9d2f0, type: 3}
   m_Name: DepthNormals
   m_EditorClassIdentifier: 
-  m_Active: 1
+  m_Active: 0

@@ -2,12 +2,6 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
-public struct SubstrateProperties
-{
-    public float density;
-    public float porosity;
-}
-
 public class BasicTankVisualizer : MonoBehaviour
 {
 	public static BasicTankVisualizer Instance;
@@ -24,6 +18,8 @@ public class BasicTankVisualizer : MonoBehaviour
 	[Header("Text Output Fields")] public Text tankCapacityText;
 	public Text tankSafetyFactor;
 	public Text tankDeflection;
+
+	//public LineRenderer[] lines;
 
 	// parameters from user
 	private float _glassThickness;
@@ -128,6 +124,57 @@ public class BasicTankVisualizer : MonoBehaviour
 		tankObj.transform.GetChild(3).transform.localScale = newscale;
 		tankObj.transform.GetChild(4).transform.localScale = newscale;
 
+		// now reposition the whole tank
+		float dist = _tankDimensions.x / INCH_2_M * 0.041f + 0.15f;
+		Vector3 pos = Camera.main.ScreenToWorldPoint(new Vector3(0.5f * Screen.width + tankSidePanelObj.GetComponent<RectTransform>().rect.height * 0.55f, 0.5f * Screen.height, dist));
+		tankObj.transform.position = pos + Vector3.down * _tankDimensions.y * 0.6f;
+		//Debug.Log(tankSidePanelObj.GetComponent<RectTransform>().rect.position);
+
+
+		//var uppervertices = new Vector3[4];
+		//var thisMatrix = tankObj.transform.GetChild(0).localToWorldMatrix;
+
+		//var extents = _tankDimensions * 0.5f;
+		//uppervertices[0] = tankObj.transform.GetChild(0).rotation * new Vector3(extents.x, extents.y, extents.z);
+		//uppervertices[1] = tankObj.transform.GetChild(0).rotation * new Vector3(-extents.x, extents.y, extents.z);
+		//uppervertices[2] = tankObj.transform.GetChild(0).rotation * new Vector3(-extents.x, extents.y, -extents.z);
+		//uppervertices[3] = tankObj.transform.GetChild(0).rotation * new Vector3(extents.x, extents.y, -extents.z);
+		//vertices[4] = tankObj.transform.GetChild(0).rotation * new Vector3(extents.x, -extents.y, extents.z);
+		//vertices[5] = tankObj.transform.GetChild(0).rotation * new Vector3(-extents.x, -extents.y, extents.z);
+		//vertices[6] = tankObj.transform.GetChild(0).rotation * new Vector3(-extents.x, -extents.y, -extents.z);
+		//vertices[7] = tankObj.transform.GetChild(0).rotation * new Vector3(extents.x, -extents.y, -extents.z);
+
+		//vertices[0] = thisMatrix.MultiplyPoint3x4(extents);
+		//vertices[1] = thisMatrix.MultiplyPoint3x4(new Vector3(-extents.x, extents.y, extents.z));
+		//vertices[2] = thisMatrix.MultiplyPoint3x4(new Vector3(-extents.x, extents.y, -extents.z));
+		//vertices[3] = thisMatrix.MultiplyPoint3x4(new Vector3(extents.x, extents.y, -extents.z));
+		//vertices[4] = thisMatrix.MultiplyPoint3x4(new Vector3(extents.x, -extents.y, -extents.z));
+		//vertices[5] = thisMatrix.MultiplyPoint3x4(new Vector3(extents.x, -extents.y, extents.z));
+		//vertices[6] = thisMatrix.MultiplyPoint3x4(new Vector3(-extents.x, -extents.y, -extents.z));
+		//vertices[7] = thisMatrix.MultiplyPoint3x4(-extents);
+
+		//lines[0].transform.position = tankObj.transform.position + tankObj.transform.up * 0.5f * _tankDimensions.y;
+		//lines[1].transform.position = vertices[1];
+		//lines[2].transform.position = vertices[2];
+		//lines[3].transform.position = vertices[3];
+		//lines[4].transform.position = vertices[4];
+		//lines[5].transform.position = vertices[5];
+		//lines[6].transform.position = vertices[6];
+		//lines[7].transform.position = vertices[7];
+
+		//lines[0].positionCount = uppervertices.Length+1;
+		//lines[0].SetPositions(uppervertices);
+		//lines[0].SetPosition(lines[0].positionCount-1, uppervertices[0]);
+		//lines[0].SetPosition(1, vertices[1] - vertices[0]);
+		//lines[1].SetPosition(1, vertices[2] - vertices[1]);
+		//lines[2].SetPosition(1, vertices[3] - vertices[2]);
+		//lines[3].SetPosition(1, vertices[0] - vertices[3]);
+		//lines[4].SetPosition(1, vertices[5] - vertices[4]);
+		//lines[5].SetPosition(1, vertices[6] - vertices[5]);
+		//lines[6].SetPosition(1, vertices[7] - vertices[6]);
+		//lines[7].SetPosition(1, vertices[4] - vertices[7]);
+
+
 		// update the info text
 		UpdateInfoText();
 	}
@@ -173,9 +220,21 @@ public class BasicTankVisualizer : MonoBehaviour
 		// -- update glass panel dimensions -- //
 		TankSpecCalculator.CalculateSidePanelDimensions(_tankDimensions, _glassThickness, out var botP, out var frontP,
 			out var sideP);
-		//Debug.Log(botP.ToString("F3") + " | " + frontP.ToString("F3") + " | " + sideP.ToString("F3"));
 
-		float in_2_px_scale = 250f / (botP.y + 2f * frontP.y);
+		tankSidePanelObj.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 1.1f * tankSidePanelObj.GetComponent<RectTransform>().rect.height);
+
+		Vector2 sideRectSize = tankSidePanelObj.GetComponent<RectTransform>().rect.size;
+		float sideRectAR = sideRectSize.x / sideRectSize.y;
+
+		Vector2 tankSize = new Vector2(botP.x + 2f * frontP.y, botP.y + 2f * frontP.y);
+		float tankAR = tankSize.x / tankSize.y;
+
+		//Debug.Log(sideRectAR.ToString("F2")+ " | " + tankAR.ToString("F2"));
+
+		const float PX_SPACING = 5.0f;
+		float in_2_px_scale =	sideRectAR > tankAR ?
+								(sideRectSize.y - 4f * PX_SPACING) / (botP.y + 2f * frontP.y) :
+								(sideRectSize.x - 4f * PX_SPACING) / (botP.x + 2f * frontP.y);
 
 		// update the bottom panel
 		Vector2 botPxDim = botP * in_2_px_scale;
@@ -184,7 +243,7 @@ public class BasicTankVisualizer : MonoBehaviour
 
 		// update front panel(s)
 		Vector2 newSize = frontP * in_2_px_scale;
-		Vector2 newpos = new Vector2(0f, (newSize.y + botPxDim.y) * 0.5f + 5f);
+		Vector2 newpos = new Vector2(0f, (newSize.y + botPxDim.y) * 0.5f + PX_SPACING);
 		tankSidePanelObj.GetChild(1).GetComponent<RectTransform>().sizeDelta = newSize;
 		tankSidePanelObj.GetChild(1).GetComponent<RectTransform>().anchoredPosition = newpos;
 		tankSidePanelObj.GetChild(1).GetChild(0).GetComponent<Text>().text = frontP.x + " x " + frontP.y;
@@ -195,7 +254,7 @@ public class BasicTankVisualizer : MonoBehaviour
 
 		// update side panel(s)
 		newSize = new Vector2(sideP.y, sideP.x) * in_2_px_scale;
-		newpos = new Vector2((newSize.x + botPxDim.x) * 0.5f + 5f, 0);
+		newpos = new Vector2((newSize.x + botPxDim.x) * 0.5f + PX_SPACING, 0);
 		tankSidePanelObj.GetChild(3).GetComponent<RectTransform>().sizeDelta = newSize;
 		tankSidePanelObj.GetChild(3).GetComponent<RectTransform>().anchoredPosition = newpos;
 		tankSidePanelObj.GetChild(3).GetChild(0).GetComponent<Text>().text = sideP.x + " x " + sideP.y;

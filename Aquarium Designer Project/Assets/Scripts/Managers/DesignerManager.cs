@@ -2,6 +2,12 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
+public struct SubstrateProperties
+{
+	public float density;
+	public float porosity;
+}
+
 public class DesignerManager : MonoBehaviour
 {
 	public static DesignerManager Instance;
