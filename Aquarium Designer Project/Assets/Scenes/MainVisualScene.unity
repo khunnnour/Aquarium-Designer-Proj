@@ -97,7 +97,7 @@ LightmapSettings:
     m_ExportTrainingData: 0
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
-  m_LightingDataAsset: {fileID: 112000000, guid: 8d2d5f51ff2a13d43923df8b41a91a9e, type: 2}
+  m_LightingDataAsset: {fileID: 112000000, guid: fe1c8cba92c3e5341bb1bfbc8e8fb0e6, type: 2}
   m_LightingSettings: {fileID: 4890085278179872738, guid: 477cc4148fad3449482a3bc3178594e2, type: 2}
 --- !u!196 &4
 NavMeshSettings:
@@ -930,7 +930,7 @@ MonoBehaviour:
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
   m_RenderPostProcessing: 0
-  m_Antialiasing: 0
+  m_Antialiasing: 1
   m_AntialiasingQuality: 2
   m_StopNaN: 0
   m_Dithering: 0
@@ -1511,8 +1511,8 @@ Light:
   serializedVersion: 10
   m_Type: 0
   m_Shape: 0
-  m_Color: {r: 1, g: 0.997, b: 0.975, a: 1}
-  m_Intensity: 3
+  m_Color: {r: 1, g: 0.99722636, b: 0.98039216, a: 1}
+  m_Intensity: 2.4
   m_Range: 12
   m_SpotAngle: 125
   m_InnerSpotAngle: 82.5
@@ -1554,7 +1554,7 @@ Light:
   m_Lightmapping: 1
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1.2, y: 1.2}
-  m_BounceIntensity: 1.15
+  m_BounceIntensity: 1.2
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
@@ -2079,8 +2079,8 @@ Light:
   serializedVersion: 10
   m_Type: 0
   m_Shape: 0
-  m_Color: {r: 1, g: 0.997, b: 0.975, a: 1}
-  m_Intensity: 3
+  m_Color: {r: 1, g: 0.99722636, b: 0.98039216, a: 1}
+  m_Intensity: 2.4
   m_Range: 12
   m_SpotAngle: 125
   m_InnerSpotAngle: 82.5
@@ -2122,7 +2122,7 @@ Light:
   m_Lightmapping: 1
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1.2, y: 1.2}
-  m_BounceIntensity: 1.15
+  m_BounceIntensity: 1.2
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
@@ -4768,8 +4768,8 @@ Light:
   serializedVersion: 10
   m_Type: 0
   m_Shape: 0
-  m_Color: {r: 1, g: 0.997, b: 0.975, a: 1}
-  m_Intensity: 3
+  m_Color: {r: 1, g: 0.99722636, b: 0.98039216, a: 1}
+  m_Intensity: 2.4
   m_Range: 12
   m_SpotAngle: 125
   m_InnerSpotAngle: 82.5
@@ -4811,7 +4811,7 @@ Light:
   m_Lightmapping: 1
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1.2, y: 1.2}
-  m_BounceIntensity: 1.15
+  m_BounceIntensity: 1.2
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
@@ -7782,8 +7782,8 @@ Light:
   serializedVersion: 10
   m_Type: 0
   m_Shape: 0
-  m_Color: {r: 1, g: 0.997, b: 0.975, a: 1}
-  m_Intensity: 3
+  m_Color: {r: 1, g: 0.99722636, b: 0.98039216, a: 1}
+  m_Intensity: 2.4
   m_Range: 12
   m_SpotAngle: 125
   m_InnerSpotAngle: 82.5
@@ -7825,7 +7825,7 @@ Light:
   m_Lightmapping: 1
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 7, y: 7}
-  m_BounceIntensity: 1.15
+  m_BounceIntensity: 1.2
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
   m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
@@ -10669,7 +10669,6 @@ GameObject:
   - component: {fileID: 2141007268}
   - component: {fileID: 2141007267}
   - component: {fileID: 2141007266}
-  - component: {fileID: 2141007265}
   m_Layer: 0
   m_Name: TableTop
   m_TagString: Untagged
@@ -10677,19 +10676,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 4294967295
   m_IsActive: 1
---- !u!65 &2141007265
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2141007264}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &2141007266
 MeshRenderer:
   m_ObjectHideFlags: 0
