@@ -13,27 +13,39 @@ public struct SheetProperties
 {
 	public float tensileStrength;
 	public float elasticityModulus;
+	public float density;
 }
 
 public class TankSpecCalculator : MonoBehaviour
 {
-	private const float M_TO_INCH = 39.37008f;
-	// 5ft2 / gal
-	private const float BSA_PER_GAL = 0.464515f; // m2 / gal
-	
-	private const float GLASS_TENSILE_STR	 = 19f; // MPa
-	private const float GLASS_MOD_ELASTICITY = 69000f; // MPa
-	
-	private const float ACRYLIC_TENSILE_STR		= 73.920f; // MPa
-	private const float ACRYLIC_MOD_ELASTICITY	= 2942.5f; // MPa
+	// Conversion constants
+	public const float M_TO_INCH = 39.37008f;
+	public const float KG_TO_LB = 2.20462f;
+	public const float IN2_TO_M2 = 0.00064516f;
 
-	private const float POLYCARBONATE_TENSILE_STR	 = 65.375f; // MPa
-	private const float POLYCARBONATE_MOD_ELASTICITY = 2359.3f; // MPa
+	// 5ft2 / gal
+	public const float BSA_PER_GAL = 0.464515f; // m2 / gal
+	
+	// Material properties
+	public const float GLASS_TENSILE_STR	 = 19f;		// MPa
+	public const float GLASS_MOD_ELASTICITY = 69000f;	// MPa
+	public const float GLASS_DENSITY = 2500f;			// kg / m3
+
+	public const float ACRYLIC_TENSILE_STR		= 73.920f; // MPa
+	public const float ACRYLIC_MOD_ELASTICITY	= 2942.5f; // MPa
+	public const float ACRYLIC_DENSITY = 1051.1f;         // kg / m3
+
+	public const float POLYCARBONATE_TENSILE_STR	 = 65.375f; // MPa
+	public const float POLYCARBONATE_MOD_ELASTICITY = 2359.3f; // MPa
+	public const float POLYCARBONATE_DENSITY = 1200f;           // kg / m3
+
+	public const float WATER_DENSITY = 1000f;  // kg / m3
+
 
 	private static readonly SheetProperties[] sheetProperties = {
-		new SheetProperties { tensileStrength=GLASS_TENSILE_STR, elasticityModulus=GLASS_MOD_ELASTICITY },
-		new SheetProperties { tensileStrength=ACRYLIC_TENSILE_STR, elasticityModulus=ACRYLIC_MOD_ELASTICITY },
-		new SheetProperties { tensileStrength=POLYCARBONATE_TENSILE_STR, elasticityModulus=POLYCARBONATE_MOD_ELASTICITY }
+		new SheetProperties { tensileStrength=GLASS_TENSILE_STR, elasticityModulus=GLASS_MOD_ELASTICITY, density=GLASS_DENSITY },
+		new SheetProperties { tensileStrength=ACRYLIC_TENSILE_STR, elasticityModulus=ACRYLIC_MOD_ELASTICITY, density=ACRYLIC_DENSITY },
+		new SheetProperties { tensileStrength=POLYCARBONATE_TENSILE_STR, elasticityModulus=POLYCARBONATE_MOD_ELASTICITY, density=POLYCARBONATE_DENSITY }
 	};
 
 	/// <summary>
@@ -98,5 +110,15 @@ public class TankSpecCalculator : MonoBehaviour
 		frontPanDim = new Vector2(tankDims.x, sideHeight) * M_TO_INCH;
 		// side panel dimensions
 		sidePanDim = new Vector2(tankDims.z - 2f * thick, sideHeight) * M_TO_INCH;
+	}
+
+	public static float CalculateWaterWeight(float waterVol)
+	{
+		return waterVol * WATER_DENSITY;
+	}
+
+	public static float CalculateTankWeight(float sA, float gT, SheetMaterial material)
+	{
+		return sA * gT * sheetProperties[(int)material].density;
 	}
 }

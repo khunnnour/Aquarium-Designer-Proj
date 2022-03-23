@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class BasicTankVisualizer : MonoBehaviour
@@ -18,22 +19,26 @@ public class BasicTankVisualizer : MonoBehaviour
 	public InputField tankDimZ;
 	public Transform tankSidePanelObj;
 
-	[Header("Text Output Fields")] public Text tankCapacityText;
+	[Header("Text Output Fields")]
+	public Text tankCapacityText;
 	public Text tankSafetyFactor;
 	public Text tankDeflection;
+	public Text glassAreaText;
+	public Text glassWeightText;
 
 	//public LineRenderer[] lines;
 
 	// parameters from user
 	private float _glassThickness;
 	private Vector3 _tankDimensions;
-	private Vector3 _origEulers;
 	private Vector3 _mouseLastPos;
 
 	private SheetMaterial _constructionMat;
 
 	private const float INCH_2_M = 0.0254f; // in/m
 	private const float MAT_THICKNESS = (3f / 8f) * INCH_2_M; // m    
+
+	public Vector3 TankDimensions() { return _tankDimensions; }
 
 	private void Awake()
 	{
@@ -43,7 +48,6 @@ public class BasicTankVisualizer : MonoBehaviour
 
 	private void Start()
 	{
-		_origEulers = tankObj.transform.rotation.eulerAngles;
 		UpdateTank();
 	}
 
@@ -61,10 +65,10 @@ public class BasicTankVisualizer : MonoBehaviour
 		if (Input.GetMouseButton(1))
 		{
 			diff *= 60f;
-			
+
 			Debug.Log("rotating " + diff);
-			
-			tankObj.transform.Rotate(Vector3.up,   -diff.x, Space.World);
+
+			tankObj.transform.Rotate(Vector3.up, -diff.x, Space.World);
 			tankObj.transform.Rotate(Vector3.right, diff.y, Space.World);
 			//
 			//// clamp angles
@@ -180,8 +184,8 @@ public class BasicTankVisualizer : MonoBehaviour
 		// calculate total internal capacity --
 		// internal volume in m^3
 		float intVol = (_tankDimensions.x - 2 * _glassThickness) *
-		               (_tankDimensions.z - 2 * _glassThickness) *
-		               (_tankDimensions.y - _glassThickness);
+					   (_tankDimensions.z - 2 * _glassThickness) *
+					   (_tankDimensions.y - _glassThickness);
 		// capacity in liters
 		float literCap = intVol * 1000f;
 		// capacity in gallons
@@ -189,7 +193,7 @@ public class BasicTankVisualizer : MonoBehaviour
 		// update the text
 		tankCapacityText.text = "~" + gallonCap.ToString("F1") + " gal (" + literCap.ToString("F1") + " L)";
 
-		_constructionMat = (SheetMaterial) materialField.value;
+		_constructionMat = (SheetMaterial)materialField.value;
 
 		// -- update safety factor -- //
 		float safeFactor = TankSpecCalculator.CalculateSafetyFactor(_tankDimensions, _glassThickness, _constructionMat);
@@ -208,10 +212,18 @@ public class BasicTankVisualizer : MonoBehaviour
 		else tankDeflection.color = ColorNorm;
 
 
-		// -- update glass panel dimensions -- //
-		TankSpecCalculator.CalculateSidePanelDimensions(_tankDimensions, _glassThickness, out var botP, out var frontP,
-			out var sideP);
+		// retrieve dimensions of sides
+		TankSpecCalculator.CalculateSidePanelDimensions(_tankDimensions, _glassThickness, out Vector2 botP, out Vector2 frontP, out Vector2 sideP);
 
+
+		float sA = (botP.x * botP.y + 2f * (frontP.x * frontP.y + sideP.x * sideP.y)); // calculate surface area
+		glassAreaText.text = sA.ToString("F1") + " in2 (" + (sA * TankSpecCalculator.IN2_TO_M2).ToString("F1") + " m2)";
+
+		float tankWeight = TankSpecCalculator.CalculateTankWeight(sA * TankSpecCalculator.IN2_TO_M2, _glassThickness, _constructionMat);
+		glassWeightText.text = (tankWeight * TankSpecCalculator.KG_TO_LB).ToString("F1") + " lbs (" + tankWeight.ToString("F1") + " kg)";
+
+
+		// -- update glass panel dimension UI -- //
 		tankSidePanelObj.GetComponent<RectTransform>().SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, tankSidePanelObj.GetComponent<RectTransform>().rect.height);
 
 		Vector2 sideRectSize = tankSidePanelObj.GetComponent<RectTransform>().rect.size;
@@ -223,7 +235,7 @@ public class BasicTankVisualizer : MonoBehaviour
 		//Debug.Log(sideRectAR.ToString("F2")+ " | " + tankAR.ToString("F2"));
 
 		const float PX_SPACING = 7.0f;
-		float in_2_px_scale =	1 > tankAR ?
+		float in_2_px_scale = 1 > tankAR ?
 								(sideRectSize.y - 4f * PX_SPACING) / (botP.y + 2f * frontP.y) :
 								(sideRectSize.x - 4f * PX_SPACING) / (botP.x + 2f * frontP.y);
 
@@ -253,7 +265,12 @@ public class BasicTankVisualizer : MonoBehaviour
 		tankSidePanelObj.GetChild(4).GetComponent<RectTransform>().sizeDelta = newSize;
 		tankSidePanelObj.GetChild(4).GetComponent<RectTransform>().anchoredPosition = newpos;
 		tankSidePanelObj.GetChild(4).GetChild(0).GetComponent<Text>().text = sideP.x + " x " + sideP.y;
+	}
 
-		
+	public void TransitionToFullVisualizer()
+	{
+		PlayerPrefInterface.SetTankSpecs(_tankDimensions, _glassThickness);
+
+		SceneManager.LoadSceneAsync(1, LoadSceneMode.Single);
 	}
 }

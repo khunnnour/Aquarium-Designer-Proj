@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public struct SubstrateProperties
@@ -58,7 +59,7 @@ public class DesignerManager : MonoBehaviour
 
 	private void Awake()
 	{
-		Application.targetFrameRate = 48;
+		Application.targetFrameRate = -1;
 		Instance = this;
 	}
 
@@ -67,54 +68,14 @@ public class DesignerManager : MonoBehaviour
 		_camTran = Camera.main.transform;
 		_camController = Camera.main.GetComponent<CameraController>();
 
+		_tankDimensions = PlayerPrefInterface.GetTankDimensions();
+		_glassThickness = PlayerPrefInterface.GetGlassThickness();
+
 		UpdateTank();
 	}
 
-	public void UpdateTank()
+	private void UpdateTank()
 	{
-		/* - get the new parameters - */
-		// get thickness
-		if (float.TryParse(glassThickField.text, out _glassThickness))
-		{
-			_glassThickness *= INCH_2_M;
-		}
-		else
-		{
-			_glassThickness = 0.25f * INCH_2_M;
-			glassThickField.text = (0.25f).ToString("F2");
-		}
-
-		// get tank dimensions
-		if (float.TryParse(tankDimX.text, out _tankDimensions.x))
-		{
-			_tankDimensions.x *= INCH_2_M;
-		}
-		else
-		{
-			_tankDimensions.x = 20.25f * INCH_2_M;
-			tankDimX.text = (20.25f).ToString("F2");
-		}
-
-		if (float.TryParse(tankDimY.text, out _tankDimensions.y))
-		{
-			_tankDimensions.y *= INCH_2_M;
-		}
-		else
-		{
-			_tankDimensions.y = 12.5f * INCH_2_M;
-			tankDimY.text = (12.5f).ToString("F2");
-		}
-
-		if (float.TryParse(tankDimZ.text, out _tankDimensions.z))
-		{
-			_tankDimensions.z *= INCH_2_M;
-		}
-		else
-		{
-			_tankDimensions.z = 10.50f * INCH_2_M;
-			tankDimZ.text = (10.50f).ToString("F2");
-		}
-
 		/* - update the tank object - */
 		// neoprene mat --
 		// set position
@@ -166,20 +127,6 @@ public class DesignerManager : MonoBehaviour
 		// updates camera distance
 		//UpdateCamPos();
 		_camController.PlaceCamera();
-	}
-
-	void UpdateCamPos()
-	{
-		float newZoom = -0.489f * _tankDimensions.x + -0.562f;
-		// Update Camera Position
-		Vector3 camTargetPos = new Vector3(0,
-			tankObj.transform.GetChild(4).position.y + 0.2f,
-			newZoom
-		);
-
-		//Quaternion camTargetRot = Quaternion.Euler(15f, 0, 0);
-		//StartCoroutine(MoveCamera(camTargetPos, camTargetRot));
-		StartCoroutine(MoveCamera(camTargetPos));
 	}
 
 	// updates the labels for the main panel labels
@@ -363,5 +310,12 @@ public class DesignerManager : MonoBehaviour
 			//_camTran.rotation = Quaternion.Slerp(sRot, tRot, t / timeToTarget);
 			yield return new WaitForEndOfFrame();
 		}
+	}
+
+	public void TransitionToBasicVisualizer()
+	{
+
+
+		SceneManager.LoadSceneAsync(0, LoadSceneMode.Single);
 	}
 }
