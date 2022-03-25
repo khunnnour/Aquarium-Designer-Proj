@@ -16,23 +16,11 @@ public class DesignerManager : MonoBehaviour
 	[Header("Object References")] public GameObject tankObj;
 	public GameObject decorObj;
 
-	[Header("Tank Spec Fields")] public Dropdown materialField;
-	public InputField glassThickField;
-	public InputField tankDimX;
-	public InputField tankDimY;
-	public InputField tankDimZ;
-	public Transform tankSidePanelObj;
-
 	[Header("Decoration Fields")] public InputField capThickField;
 	public InputField waterOffsetField;
-	public Dropdown substrateDropdown;
-
-
-	[Header("Text Output Fields")] public Text tankCapacityText;
-	public Text tankSafetyFactor;
-	public Text tankDeflection;
-	public Text substrateAmtText;
 	public Text waterAmtText;
+	public Dropdown substrateDropdown;
+	public Text substrateAmtText;
 
 	// parameters from user
 	private float _glassThickness;
@@ -41,12 +29,8 @@ public class DesignerManager : MonoBehaviour
 	private Vector3 _tankDimensions;
 
 	// other stuff
-	private Transform _camTran;
 	private CameraController _camController;
-
 	private Hashtable _substrates;
-
-	private SheetMaterial _constructionMat;
 
 
 	public void SetSubstrates(Hashtable subs)
@@ -54,8 +38,7 @@ public class DesignerManager : MonoBehaviour
 		_substrates = subs;
 	}
 
-	private const float INCH_2_M = 0.0254f; // in/m
-	private const float MAT_THICKNESS = (3f / 8f) * INCH_2_M; // m    
+	private const float MAT_THICKNESS = (3f / 8f) * TankSpecCalculator.INCH_2_M;
 
 	private void Awake()
 	{
@@ -65,11 +48,17 @@ public class DesignerManager : MonoBehaviour
 
 	private void Start()
 	{
-		_camTran = Camera.main.transform;
 		_camController = Camera.main.GetComponent<CameraController>();
 
 		_tankDimensions = PlayerPrefInterface.GetTankDimensions();
 		_glassThickness = PlayerPrefInterface.GetGlassThickness();
+
+		_capThickness = PlayerPrefInterface.GetSubstrateThickness() / TankSpecCalculator.INCH_2_M;
+		capThickField.text = _capThickness.ToString();
+		
+		_waterOffset = PlayerPrefInterface.GetWaterOffset() / TankSpecCalculator.INCH_2_M;
+		waterOffsetField.text = _waterOffset.ToString();
+
 
 		UpdateTank();
 	}
@@ -129,80 +118,8 @@ public class DesignerManager : MonoBehaviour
 		_camController.PlaceCamera();
 	}
 
-	// updates the labels for the main panel labels
-	private static readonly Color ColorBad = new Color(0.8902f, 0.0431f, 0.0431f);
-	private static readonly Color ColorNorm = new Color(0.0784f, 0.0784f, 0.0784f);
-	private static readonly Color ColorWarn = new Color(0.9216f, 0.5686f, 0.0196f);
-
 	public void UpdateInfoText()
 	{
-		// calculate total internal capacity --
-		// internal volume in m^3
-		float intVol = (_tankDimensions.x - 2 * _glassThickness) *
-					   (_tankDimensions.z - 2 * _glassThickness) *
-					   (_tankDimensions.y - _glassThickness);
-		// capacity in liters
-		float literCap = intVol * 1000f;
-		// capacity in gallons
-		float gallonCap = literCap * 0.2641720524f;
-		// update the text
-		tankCapacityText.text = "~" + gallonCap.ToString("F1") + " gal (" + literCap.ToString("F1") + " L)";
-
-		_constructionMat = (SheetMaterial)materialField.value;
-
-		// -- update safety factor -- //
-		float safeFactor = TankSpecCalculator.CalculateSafetyFactor(_tankDimensions, _glassThickness, _constructionMat);
-		tankSafetyFactor.text = "~" + safeFactor.ToString("F2");
-		// set text color based on value
-		if (safeFactor < 3.0f) tankSafetyFactor.color = ColorBad;
-		else if (safeFactor <= 3.5f) tankSafetyFactor.color = ColorWarn;
-		else tankSafetyFactor.color = ColorNorm;
-
-		// update deflection --
-		float defl = TankSpecCalculator.CalculateDeflection(_tankDimensions, _glassThickness, _constructionMat);
-		tankDeflection.text = "~" + defl.ToString("F2") + " mm";
-		// set text color based on value
-		if (defl >= 3f) tankDeflection.color = ColorBad;
-		else if (defl >= 1f) tankDeflection.color = ColorWarn;
-		else tankDeflection.color = ColorNorm;
-
-
-		// -- update glass panel dimensions -- //
-		Vector2 botP, frontP, sideP;
-		TankSpecCalculator.CalculateSidePanelDimensions(_tankDimensions, _glassThickness, out botP, out frontP, out sideP);
-		//Debug.Log(botP.ToString("F3") + " | " + frontP.ToString("F3") + " | " + sideP.ToString("F3"));
-
-		float in_2_px_scale = 140f / (botP.y + 2f * frontP.y);
-
-		// update the bottom panel
-		Vector2 botPxDim = botP * in_2_px_scale;
-		tankSidePanelObj.GetChild(0).GetComponent<RectTransform>().sizeDelta = botPxDim;
-		tankSidePanelObj.GetChild(0).GetChild(0).GetComponent<Text>().text = botP.x + " x " + botP.y;
-
-		// update front panel(s)
-		Vector2 newSize = frontP * in_2_px_scale;
-		Vector2 newpos = new Vector2(0f, (newSize.y + botPxDim.y) * 0.5f + 5f);
-		tankSidePanelObj.GetChild(1).GetComponent<RectTransform>().sizeDelta = newSize;
-		tankSidePanelObj.GetChild(1).GetComponent<RectTransform>().anchoredPosition = newpos;
-		tankSidePanelObj.GetChild(1).GetChild(0).GetComponent<Text>().text = frontP.x + " x " + frontP.y;
-		newpos *= -1;
-		tankSidePanelObj.GetChild(2).GetComponent<RectTransform>().sizeDelta = newSize;
-		tankSidePanelObj.GetChild(2).GetComponent<RectTransform>().anchoredPosition = newpos;
-		tankSidePanelObj.GetChild(2).GetChild(0).GetComponent<Text>().text = frontP.x + " x " + frontP.y;
-
-		// update side panel(s)
-		newSize = new Vector2(sideP.y, sideP.x) * in_2_px_scale;
-		newpos = new Vector2((newSize.x + botPxDim.x) * 0.5f + 5f, 0);
-		tankSidePanelObj.GetChild(3).GetComponent<RectTransform>().sizeDelta = newSize;
-		tankSidePanelObj.GetChild(3).GetComponent<RectTransform>().anchoredPosition = newpos;
-		tankSidePanelObj.GetChild(3).GetChild(0).GetComponent<Text>().text = sideP.x + " x " + sideP.y;
-		newpos *= -1;
-		tankSidePanelObj.GetChild(4).GetComponent<RectTransform>().sizeDelta = newSize;
-		tankSidePanelObj.GetChild(4).GetComponent<RectTransform>().anchoredPosition = newpos;
-		tankSidePanelObj.GetChild(4).GetChild(0).GetComponent<Text>().text = sideP.x + " x " + sideP.y;
-
-
-
 		// get substrate properties from hashtable
 		SubstrateProperties p = (SubstrateProperties)_substrates[substrateDropdown.captionText.text];
 
@@ -211,20 +128,23 @@ public class DesignerManager : MonoBehaviour
 		float substrateVol = decorObj.transform.GetChild(0).localScale.x *
 							 decorObj.transform.GetChild(0).localScale.y *
 							 decorObj.transform.GetChild(0).localScale.z;
-		substrateAmtText.text = "~" + (substrateVol * p.density).ToString("F1") + " lbs";
+		// get weight of substrate
+		float substrateWeight = substrateVol * p.density;
+		// update substrate text
+		substrateAmtText.text = "~" + substrateWeight.ToString("F1") + " lbs (" + (substrateWeight / TankSpecCalculator.KG_TO_LB).ToString("F1") + " L)";
 
 		/* - update water capacity estimate - */
 		// internal volume in m^3 of water column
 		float watVol = (_tankDimensions.x - 2 * _glassThickness) *
 					   (_tankDimensions.z - 2 * _glassThickness) *
 					   (_tankDimensions.y - _glassThickness - _waterOffset - _capThickness);
-		// volume of water in substrate
+		// volume of water w/in substrate
 		watVol += substrateVol * p.porosity;
 
 		// capacity in liters
-		float watVolL = watVol * 1000f;
+		float watVolL = watVol * TankSpecCalculator.WATER_DENSITY;
 		// capacity in gallons
-		float watVolG = watVolL * 0.2641720524f;
+		float watVolG = watVolL * TankSpecCalculator.L_TO_GAL;
 		// update the text
 		waterAmtText.text = "~" + watVolG.ToString("F1") + " gal (" + watVolL.ToString("F1") + " L)";
 	}
@@ -234,25 +154,25 @@ public class DesignerManager : MonoBehaviour
 		// get thickness of cap substrate
 		if (float.TryParse(capThickField.text, out _capThickness))
 		{
-			_capThickness *= INCH_2_M;
+			_capThickness *= TankSpecCalculator.INCH_2_M;
 		}
 		else
 		{
 			// if invalid then use a default value
-			_capThickness = 1.5f * INCH_2_M;
-			capThickField.text = (_capThickness / INCH_2_M).ToString("F1");
+			_capThickness = 1.5f * TankSpecCalculator.INCH_2_M;
+			capThickField.text = (_capThickness / TankSpecCalculator.INCH_2_M).ToString("F1");
 		}
 
 		// get water offset
 		if (float.TryParse(waterOffsetField.text, out _waterOffset))
 		{
-			_waterOffset *= INCH_2_M;
+			_waterOffset *= TankSpecCalculator.INCH_2_M;
 		}
 		else
 		{
 			// if invalid then use a default value
-			_waterOffset = 1f * INCH_2_M;
-			waterOffsetField.text = (_waterOffset / INCH_2_M).ToString("F1");
+			_waterOffset = 1f * TankSpecCalculator.INCH_2_M;
+			waterOffsetField.text = (_waterOffset / TankSpecCalculator.INCH_2_M).ToString("F1");
 		}
 
 		// update cap substrate dimensions
@@ -269,10 +189,6 @@ public class DesignerManager : MonoBehaviour
 		//Debug.Log(path);
 		Material newMat = Resources.Load<Material>(path);
 		decorObj.transform.GetChild(0).GetComponent<MeshRenderer>().material = newMat;
-		//Vector2 newTScale = new Vector2(
-		//	newScale.x * 1.5f,
-		//	newScale.z * 1.5f);
-		//newMat.SetTextureScale("_BaseMap", newTScale);
 
 		// update water
 		float waterDepth = _tankDimensions.y - _waterOffset - _capThickness - _glassThickness;
@@ -295,26 +211,9 @@ public class DesignerManager : MonoBehaviour
 		UpdateInfoText();
 	}
 
-	//IEnumerator MoveCamera(Vector3 tPos, Quaternion tRot)
-	IEnumerator MoveCamera(Vector3 tPos)
-	{
-		const float timeToTarget = 0.3f;
-
-		float t = 0;
-
-		Vector3 sPos = _camTran.position;
-		while (t <= timeToTarget)
-		{
-			t += Time.deltaTime;
-			_camTran.position = Vector3.Slerp(sPos, tPos, t / timeToTarget);
-			//_camTran.rotation = Quaternion.Slerp(sRot, tRot, t / timeToTarget);
-			yield return new WaitForEndOfFrame();
-		}
-	}
-
 	public void TransitionToBasicVisualizer()
 	{
-
+		PlayerPrefInterface.SetInsideSpecs(_capThickness, _waterOffset);
 
 		SceneManager.LoadSceneAsync(0, LoadSceneMode.Single);
 	}

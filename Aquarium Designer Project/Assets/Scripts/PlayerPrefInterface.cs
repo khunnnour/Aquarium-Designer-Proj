@@ -5,7 +5,13 @@ public static class PlayerPrefInterface
 	private const string PREFKEY_TANKDIM_X = "TankWidth";
 	private const string PREFKEY_TANKDIM_Y = "TankHeight";
 	private const string PREFKEY_TANKDIM_Z = "TankDepth";
+	
 	private const string PREFKEY_GLASS_THICKNESS = "GlassThick";
+
+	private const string PREFKEY_SUBSTRATE_TYPE = "SubstrateType";
+	private const string PREFKEY_SUBSTRATE_THICK = "SubstrateThick";
+
+	private const string PREFKEY_WATER_OFFSET = "WaterOffset";
 
 	/// <summary>
 	/// Update the tank specifications
@@ -23,6 +29,16 @@ public static class PlayerPrefInterface
 		SavePreferences();
 	}
 
+	public static void SetInsideSpecs(float sT, float wO)
+	{
+		PlayerPrefs.SetFloat(PREFKEY_SUBSTRATE_THICK, sT);
+
+		PlayerPrefs.SetFloat(PREFKEY_WATER_OFFSET, wO);
+
+		SavePreferences();
+	}
+
+
 	// get the level status
 	public static Vector3 GetTankDimensions()
 	{
@@ -37,6 +53,17 @@ public static class PlayerPrefInterface
 	{
 		return PlayerPrefs.GetFloat(PREFKEY_GLASS_THICKNESS);
 	}
+
+	public static float GetSubstrateThickness()
+	{
+		return PlayerPrefs.GetFloat(PREFKEY_SUBSTRATE_THICK);
+	}
+
+	public static float GetWaterOffset()
+	{
+		return PlayerPrefs.GetFloat(PREFKEY_WATER_OFFSET);
+	}
+
 
 	// save all changes to player prefences to disk
 	public static void SavePreferences()

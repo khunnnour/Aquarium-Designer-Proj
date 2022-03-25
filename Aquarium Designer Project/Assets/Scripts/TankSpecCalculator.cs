@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 
 public enum SheetMaterial
@@ -19,9 +18,11 @@ public struct SheetProperties
 public class TankSpecCalculator : MonoBehaviour
 {
 	// Conversion constants
-	public const float M_TO_INCH = 39.37008f;
-	public const float KG_TO_LB = 2.20462f;
-	public const float IN2_TO_M2 = 0.00064516f;
+	public const float M_TO_INCH	= 39.370080f;
+	public const float INCH_2_M		=  0.025400f;
+	public const float KG_TO_LB		=  2.204620f;
+	public const float IN2_TO_M2	=  0.000645f;
+	public const float L_TO_GAL		=  0.264172f;
 
 	// 5ft2 / gal
 	public const float BSA_PER_GAL = 0.464515f; // m2 / gal

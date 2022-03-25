@@ -35,9 +35,6 @@ public class BasicTankVisualizer : MonoBehaviour
 
 	private SheetMaterial _constructionMat;
 
-	private const float INCH_2_M = 0.0254f; // in/m
-	private const float MAT_THICKNESS = (3f / 8f) * INCH_2_M; // m    
-
 	public Vector3 TankDimensions() { return _tankDimensions; }
 
 	private void Awake()
@@ -48,6 +45,14 @@ public class BasicTankVisualizer : MonoBehaviour
 
 	private void Start()
 	{
+		_tankDimensions = PlayerPrefInterface.GetTankDimensions();
+		tankDimX.text=(_tankDimensions.x / TankSpecCalculator.INCH_2_M).ToString();
+		tankDimY.text=(_tankDimensions.y / TankSpecCalculator.INCH_2_M).ToString();
+		tankDimZ.text=(_tankDimensions.z / TankSpecCalculator.INCH_2_M).ToString();
+
+		_glassThickness = PlayerPrefInterface.GetGlassThickness() / TankSpecCalculator.INCH_2_M;
+		glassThickField.text = _glassThickness.ToString();
+
 		UpdateTank();
 	}
 
@@ -70,14 +75,6 @@ public class BasicTankVisualizer : MonoBehaviour
 
 			tankObj.transform.Rotate(Vector3.up, -diff.x, Space.World);
 			tankObj.transform.Rotate(Vector3.right, diff.y, Space.World);
-			//
-			//// clamp angles
-			//Vector3 newEuler = tankObj.transform.rotation.eulerAngles;
-			//newEuler.x = Mathf.Max(Mathf.Min(newEuler.x, _origEulers.x + rotRange.x), _origEulers.x - rotRange.x);
-			//newEuler.y = Mathf.Max(Mathf.Min(newEuler.y, _origEulers.y + rotRange.y), _origEulers.y - rotRange.y);
-			//newEuler.z = Mathf.Max(Mathf.Min(newEuler.z, _origEulers.z + rotRange.z), _origEulers.z - rotRange.z);
-			//
-			//tankObj.transform.rotation = Quaternion.Euler(newEuler);
 		}
 
 		_mouseLastPos = currMousePos;
@@ -89,42 +86,42 @@ public class BasicTankVisualizer : MonoBehaviour
 		// get thickness
 		if (float.TryParse(glassThickField.text, out _glassThickness))
 		{
-			_glassThickness *= INCH_2_M;
+			_glassThickness *= TankSpecCalculator.INCH_2_M;
 		}
 		else
 		{
-			_glassThickness = 0.25f * INCH_2_M;
+			_glassThickness = 0.25f * TankSpecCalculator.INCH_2_M;
 			glassThickField.text = (0.25f).ToString("F2");
 		}
 
 		// get tank dimensions
 		if (float.TryParse(tankDimX.text, out _tankDimensions.x))
 		{
-			_tankDimensions.x *= INCH_2_M;
+			_tankDimensions.x *= TankSpecCalculator.INCH_2_M;
 		}
 		else
 		{
-			_tankDimensions.x = 20.25f * INCH_2_M;
+			_tankDimensions.x = 20.25f * TankSpecCalculator.INCH_2_M;
 			tankDimX.text = (20.25f).ToString("F2");
 		}
 
 		if (float.TryParse(tankDimY.text, out _tankDimensions.y))
 		{
-			_tankDimensions.y *= INCH_2_M;
+			_tankDimensions.y *= TankSpecCalculator.INCH_2_M;
 		}
 		else
 		{
-			_tankDimensions.y = 12.5f * INCH_2_M;
+			_tankDimensions.y = 12.5f * TankSpecCalculator.INCH_2_M;
 			tankDimY.text = (12.5f).ToString("F2");
 		}
 
 		if (float.TryParse(tankDimZ.text, out _tankDimensions.z))
 		{
-			_tankDimensions.z *= INCH_2_M;
+			_tankDimensions.z *= TankSpecCalculator.INCH_2_M;
 		}
 		else
 		{
-			_tankDimensions.z = 10.50f * INCH_2_M;
+			_tankDimensions.z = 10.50f * TankSpecCalculator.INCH_2_M;
 			tankDimZ.text = (10.50f).ToString("F2");
 		}
 
@@ -165,7 +162,7 @@ public class BasicTankVisualizer : MonoBehaviour
 		tankObj.transform.GetChild(4).transform.localScale = newscale;
 
 		// now reposition the whole tank
-		float dist = _tankDimensions.x / INCH_2_M * 0.033f + 0.25f;
+		float dist = _tankDimensions.x / TankSpecCalculator.INCH_2_M * 0.033f + 0.25f;
 		Vector3 pos = Camera.main.ScreenToWorldPoint(new Vector3(0.475f * (Screen.width + tankSidePanelObj.GetComponent<RectTransform>().rect.height), 0.5f * Screen.height, dist));
 		tankObj.transform.position = pos;
 
