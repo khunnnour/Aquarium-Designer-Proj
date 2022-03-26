@@ -59,7 +59,7 @@ public static class PlayerPrefInterface
 		float gT = PlayerPrefs.GetFloat(PREFKEY_GLASS_THICKNESS);
 
 		if (gT <= 0f)
-			return 0.0032f;
+			return 0.003175f;
 
 		return gT;
 	}

@@ -4379,8 +4379,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: 1}
-  m_SizeDelta: {x: 2, y: 100}
+  m_AnchoredPosition: {x: 0, y: 2}
+  m_SizeDelta: {x: 4, y: 100}
   m_Pivot: {x: 0.5, y: 1}
 --- !u!114 &1347724515
 MonoBehaviour:
@@ -5719,7 +5719,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 25, y: -27}
+  m_AnchoredPosition: {x: 27, y: -28}
   m_SizeDelta: {x: 145, y: 45}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &1615114475
@@ -6450,7 +6450,7 @@ MonoBehaviour:
   xSlider: {fileID: 1782007841}
   xRotRange: {x: -25, y: 30}
   ySlider: {fileID: 855840842}
-  yRotRange: {x: -30, y: 50}
+  yRotRange: {x: 50, y: -30}
   materialField: {fileID: 1914613522}
   glassThickField: {fileID: 1467762526}
   tankDimX: {fileID: 425951907}
