@@ -9,8 +9,11 @@ public class BasicTankVisualizer : MonoBehaviour
 
 	[Header("Object References")] public GameObject tankObj;
 
-	[Header("Object References")]
-	Vector3 rotRange = Vector3.one * 20f;
+	[Header("Tank Rotate Variables")]
+	public Slider xSlider;
+	public Vector2 xRotRange = Vector2.one * 20f;
+	public Slider ySlider;
+	public Vector2 yRotRange = Vector2.one * 20f;
 
 	[Header("Tank Spec Fields")] public Dropdown materialField;
 	public InputField glassThickField;
@@ -18,6 +21,7 @@ public class BasicTankVisualizer : MonoBehaviour
 	public InputField tankDimY;
 	public InputField tankDimZ;
 	public Transform tankSidePanelObj;
+	public Toggle tankPanelLayoutToggle;
 
 	[Header("Text Output Fields")]
 	public Text tankCapacityText;
@@ -46,16 +50,18 @@ public class BasicTankVisualizer : MonoBehaviour
 	private void Start()
 	{
 		_tankDimensions = PlayerPrefInterface.GetTankDimensions();
-		tankDimX.text=(_tankDimensions.x / TankSpecCalculator.INCH_2_M).ToString();
-		tankDimY.text=(_tankDimensions.y / TankSpecCalculator.INCH_2_M).ToString();
-		tankDimZ.text=(_tankDimensions.z / TankSpecCalculator.INCH_2_M).ToString();
+		tankDimX.text = (_tankDimensions.x / TankSpecCalculator.INCH_2_M).ToString();
+		tankDimY.text = (_tankDimensions.y / TankSpecCalculator.INCH_2_M).ToString();
+		tankDimZ.text = (_tankDimensions.z / TankSpecCalculator.INCH_2_M).ToString();
 
 		_glassThickness = PlayerPrefInterface.GetGlassThickness() / TankSpecCalculator.INCH_2_M;
 		glassThickField.text = _glassThickness.ToString();
 
 		UpdateTank();
+		UpdateTankRotation();
 	}
 
+	/*
 	private void Update()
 	{
 		// Get input
@@ -71,13 +77,20 @@ public class BasicTankVisualizer : MonoBehaviour
 		{
 			diff *= 60f;
 
-			Debug.Log("rotating " + diff);
-
-			tankObj.transform.Rotate(Vector3.up, -diff.x, Space.World);
-			tankObj.transform.Rotate(Vector3.right, diff.y, Space.World);
+			tankObj.transform.Rotate(tankObj.transform.up,		-diff.x,	Space.World);
+			tankObj.transform.Rotate(tankObj.transform.right,	 diff.y,	Space.World);
 		}
 
 		_mouseLastPos = currMousePos;
+	}
+	*/
+
+	public void UpdateTankRotation()
+	{
+		float xRotate = xSlider.value * (xRotRange.y - xRotRange.x) + xRotRange.x;
+		float yRotate = ySlider.value * (yRotRange.y - yRotRange.x) + yRotRange.x;
+		Quaternion newRotate = Quaternion.Euler(xRotate, yRotate, 0);
+		tankObj.transform.rotation = newRotate;
 	}
 
 	public void UpdateTank()
@@ -128,7 +141,7 @@ public class BasicTankVisualizer : MonoBehaviour
 		/* - update the tank object - */
 		// update the base --
 		// set position
-		tankObj.transform.GetChild(0).transform.localPosition = Vector3.down * 0.5f * (_tankDimensions.y + _glassThickness);
+		tankObj.transform.GetChild(0).transform.localPosition = Vector3.down * 0.5f * _tankDimensions.y;
 		// set scale
 		tankObj.transform.GetChild(0).transform.localScale =
 			new Vector3(_tankDimensions.x, _glassThickness, _tankDimensions.z);
@@ -196,8 +209,8 @@ public class BasicTankVisualizer : MonoBehaviour
 		float safeFactor = TankSpecCalculator.CalculateSafetyFactor(_tankDimensions, _glassThickness, _constructionMat);
 		tankSafetyFactor.text = "~" + safeFactor.ToString("F2");
 		// set text color based on value
-		if (safeFactor < 3.0f) tankSafetyFactor.color = ColorBad;
-		else if (safeFactor <= 3.5f) tankSafetyFactor.color = ColorWarn;
+		if (safeFactor < 2.5f) tankSafetyFactor.color = ColorBad;
+		else if (safeFactor < 3.5f) tankSafetyFactor.color = ColorWarn;
 		else tankSafetyFactor.color = ColorNorm;
 
 		// update deflection --
@@ -241,27 +254,82 @@ public class BasicTankVisualizer : MonoBehaviour
 		tankSidePanelObj.GetChild(0).GetComponent<RectTransform>().sizeDelta = botPxDim;
 		tankSidePanelObj.GetChild(0).GetChild(0).GetComponent<Text>().text = botP.x + " x " + botP.y;
 
-		// update front panel(s)
-		Vector2 newSize = frontP * in_2_px_scale;
-		Vector2 newpos = new Vector2(0f, (newSize.y + botPxDim.y) * 0.5f + PX_SPACING);
-		tankSidePanelObj.GetChild(1).GetComponent<RectTransform>().sizeDelta = newSize;
-		tankSidePanelObj.GetChild(1).GetComponent<RectTransform>().anchoredPosition = newpos;
+		// update front panel(s) size
+		Vector2 frontPanelSize = frontP * in_2_px_scale;
+		tankSidePanelObj.GetChild(1).GetComponent<RectTransform>().sizeDelta = frontPanelSize;
 		tankSidePanelObj.GetChild(1).GetChild(0).GetComponent<Text>().text = frontP.x + " x " + frontP.y;
-		newpos *= -1;
-		tankSidePanelObj.GetChild(2).GetComponent<RectTransform>().sizeDelta = newSize;
-		tankSidePanelObj.GetChild(2).GetComponent<RectTransform>().anchoredPosition = newpos;
+		tankSidePanelObj.GetChild(2).GetComponent<RectTransform>().sizeDelta = frontPanelSize;
 		tankSidePanelObj.GetChild(2).GetChild(0).GetComponent<Text>().text = frontP.x + " x " + frontP.y;
 
-		// update side panel(s)
-		newSize = new Vector2(sideP.y, sideP.x) * in_2_px_scale;
-		newpos = new Vector2((newSize.x + botPxDim.x) * 0.5f + PX_SPACING, 0);
-		tankSidePanelObj.GetChild(3).GetComponent<RectTransform>().sizeDelta = newSize;
-		tankSidePanelObj.GetChild(3).GetComponent<RectTransform>().anchoredPosition = newpos;
+		// update side panel(s) size
+		Vector2 sidePanelSize = new Vector2(sideP.y, sideP.x) * in_2_px_scale;
+		tankSidePanelObj.GetChild(3).GetComponent<RectTransform>().sizeDelta = sidePanelSize;
 		tankSidePanelObj.GetChild(3).GetChild(0).GetComponent<Text>().text = sideP.x + " x " + sideP.y;
-		newpos *= -1;
-		tankSidePanelObj.GetChild(4).GetComponent<RectTransform>().sizeDelta = newSize;
-		tankSidePanelObj.GetChild(4).GetComponent<RectTransform>().anchoredPosition = newpos;
+		tankSidePanelObj.GetChild(4).GetComponent<RectTransform>().sizeDelta = sidePanelSize;
 		tankSidePanelObj.GetChild(4).GetChild(0).GetComponent<Text>().text = sideP.x + " x " + sideP.y;
+
+		// update the positions
+		if (tankPanelLayoutToggle.isOn)
+		{
+			// place/scale sheet panel
+			tankSidePanelObj.GetChild(5).gameObject.SetActive(true);
+
+			Vector2 fullSheetSize = new Vector2(
+				Mathf.Ceil(2f * botP.x > botP.x + 2f * frontP.y ? 2f * botP.x : botP.x + 2f * frontP.y),
+				Mathf.Ceil(frontP.y + botP.y)
+				) * in_2_px_scale;
+			tankSidePanelObj.GetChild(5).GetComponent<RectTransform>().sizeDelta = fullSheetSize;
+			tankSidePanelObj.GetChild(5).GetChild(0).GetComponent<Text>().text = fullSheetSize.x / in_2_px_scale + " x " + fullSheetSize.y / in_2_px_scale;
+
+
+			// if panel is toggled then orient inside of rectangle
+			// place the base panel position
+			Vector2 basePanelPos = new Vector2(
+				0.5f * (botPxDim.x - fullSheetSize.x),
+				0.5f * (fullSheetSize.y - botPxDim.y) - frontPanelSize.y
+				);
+			tankSidePanelObj.GetChild(0).GetComponent<RectTransform>().anchoredPosition = basePanelPos;
+
+			// place the front/back panels' positions
+			Vector2 frontPanelPos = new Vector2(
+				0.5f * (botPxDim.x - fullSheetSize.x),
+				0.5f * (fullSheetSize.y - frontPanelSize.y)
+				);
+			tankSidePanelObj.GetChild(2).GetComponent<RectTransform>().anchoredPosition = frontPanelPos;
+			frontPanelPos.x = 0.5f * (3f * botPxDim.x - fullSheetSize.x);
+			tankSidePanelObj.GetChild(1).GetComponent<RectTransform>().anchoredPosition = frontPanelPos;
+
+			// place the side panels' positions
+			Vector2 sidePanelPos = new Vector2(
+				0.5f * (frontPanelSize.y - fullSheetSize.x) + frontPanelSize.x,
+				0.5f * (fullSheetSize.y - sidePanelSize.y) - sidePanelSize.x
+				);
+			tankSidePanelObj.GetChild(3).GetComponent<RectTransform>().anchoredPosition = sidePanelPos;
+			sidePanelPos.x = 0.5f * (3f * frontPanelSize.y - fullSheetSize.x) + frontPanelSize.x;
+			tankSidePanelObj.GetChild(4).GetComponent<RectTransform>().anchoredPosition = sidePanelPos;
+
+		}
+		else
+		{
+			// otherwise format like open box
+			// place the base panel position
+			tankSidePanelObj.GetChild(0).GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
+
+			// place the front/back panels' positions
+			Vector2 frontPanelPos = new Vector2(0f, (frontPanelSize.y + botPxDim.y) * 0.5f + PX_SPACING);
+			tankSidePanelObj.GetChild(1).GetComponent<RectTransform>().anchoredPosition = frontPanelPos;
+			frontPanelPos *= -1;
+			tankSidePanelObj.GetChild(2).GetComponent<RectTransform>().anchoredPosition = frontPanelPos;
+
+			// place the side panels' positions
+			Vector2 sidePanelPos = new Vector2((sidePanelSize.x + botPxDim.x) * 0.5f + PX_SPACING, 0);
+			tankSidePanelObj.GetChild(3).GetComponent<RectTransform>().anchoredPosition = sidePanelPos;
+			sidePanelPos *= -1;
+			tankSidePanelObj.GetChild(4).GetComponent<RectTransform>().anchoredPosition = sidePanelPos;
+
+			// hide the sheet panel
+			tankSidePanelObj.GetChild(5).gameObject.SetActive(false);
+		}
 	}
 
 	public void TransitionToFullVisualizer()

@@ -42,16 +42,26 @@ public static class PlayerPrefInterface
 	// get the level status
 	public static Vector3 GetTankDimensions()
 	{
-		return new Vector3(
-				PlayerPrefs.GetFloat(PREFKEY_TANKDIM_X),
-				PlayerPrefs.GetFloat(PREFKEY_TANKDIM_Y),
-				PlayerPrefs.GetFloat(PREFKEY_TANKDIM_Z)
-			);
+		Vector3 tD=new Vector3(
+			   PlayerPrefs.GetFloat(PREFKEY_TANKDIM_X),
+			   PlayerPrefs.GetFloat(PREFKEY_TANKDIM_Y),
+			   PlayerPrefs.GetFloat(PREFKEY_TANKDIM_Z)
+		   );
+		
+		if (tD.sqrMagnitude < 0.1f)
+			return Vector3.one*0.2032f;
+
+		return tD;
 	}
 
 	public static float GetGlassThickness()
 	{
-		return PlayerPrefs.GetFloat(PREFKEY_GLASS_THICKNESS);
+		float gT = PlayerPrefs.GetFloat(PREFKEY_GLASS_THICKNESS);
+
+		if (gT <= 0f)
+			return 0.0032f;
+
+		return gT;
 	}
 
 	public static float GetSubstrateThickness()
